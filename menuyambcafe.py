@@ -47,7 +47,7 @@ st.markdown("""<style>
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 5px !important; /* GAP reducido para acercar botones */
+        gap: 5px !important;
         background: #f1f3f5;
         border-radius: 40px;
         padding: 2px 10px;
@@ -131,12 +131,7 @@ if st.session_state.auth_role is None:
     total_final = sum(v['qty']*v['price'] for v in st.session_state.carrito.values())
     if total_final > 0:
         if st.button(f"🛒 FINALIZAR PEDIDO - RD${total_final}", use_container_width=True, type="primary"): checkout_modal(mesa)
-    
-    st.markdown("""<div class='footer-premium'>
-        <div class='footer-brand'>☕ Yamb Café</div>
-        <div class='footer-text'>Cada producto apoya a jóvenes talentos en la música y el arte.</div>
-        <div class='footer-tagline'>Compra con propósito • Apoya el talento</div>
-    </div>""", unsafe_allow_html=True)
+    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div><div class='footer-tagline'>Compra con propósito • Apoya el talento</div></div>""", unsafe_allow_html=True)
 else:
     st.title(f"📊 Panel {st.session_state.auth_role}")
     if os.path.exists(file_pedidos): st.data_editor(pd.read_csv(file_pedidos), use_container_width=True)
