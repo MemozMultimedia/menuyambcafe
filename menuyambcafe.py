@@ -30,6 +30,7 @@ st.markdown("""<style>
     .product-name { color: #1e1e1e; font-weight: 700; font-size: 1.1rem; min-height: 2.5em; display: flex; align-items: center; justify-content: center; }
     .product-price { color: #e63946; font-weight: 800; font-size: 1.3rem; }
     .footer-premium { background: #fdfdfd; padding: 60px 20px; border-radius: 40px 40px 0 0; margin-top: 80px; text-align: center; border-top: 1px solid #eaeaea; }
+    .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; color: #1e1e1e; letter-spacing: -1px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 15px; }
     .whatsapp-float { position: fixed; width: 65px; height: 65px; bottom: 30px; right: 30px; background: #25d366; color: white !important; border-radius: 50px; text-align: center; font-size: 32px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 9999; display: flex; justify-content: center; align-items: center; text-decoration: none !important; }
 </style>""", unsafe_allow_html=True)
 
@@ -37,14 +38,13 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# --- Control de Roles ---
 if 'auth_role' not in st.session_state:
     st.session_state.auth_role = None
 
 whatsapp_link = f"https://wa.me/{whatsapp_number}?text=Hola!%20Vengo%20desde%20el%20menu%20digital."
 st.markdown(f"""<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'><a href='{whatsapp_link}' class='whatsapp-float' target='_blank'><i class='fab fa-whatsapp'></i></a>""", unsafe_allow_html=True)
 
-# Botón de cambio de vista (Esquina superior derecha)
+# Toggle buttons
 col_t1, col_t2 = st.columns([10, 1])
 with col_t2:
     if st.session_state.auth_role is None:
@@ -52,46 +52,87 @@ with col_t2:
     else:
         if st.button("📋"): st.session_state.auth_role = None; st.rerun()
 
+@st.dialog("📝 Finalizar Orden")
+def checkout_modal(carrito, mesa):
+    st.markdown("### Datos del Cliente")
+    with st.form("form_final"):
+        nombre = st.text_input("Nombre Completo")
+        cedula = st.text_input("Cédula / ID")
+        if st.form_submit_button("ENVIAR PEDIDO AHORA", use_container_width=True):
+            if nombre and cedula:
+                for cat in ["Comida", "Bebida"]:
+                    items = [f"{n} x{v[0]}" for n,v in carrito.items() if v[2] == cat]
+                    if items:
+                        subtotal = sum(v[0]*v[1] for n,v in carrito.items() if v[2] == cat)
+                        pd.DataFrame([{"Fecha": datetime.now().strftime("%H:%M"), "Mesa": mesa, "Cliente": nombre, "Pedido": ", ".join(items), "Total": subtotal, "Categoria": cat}]).to_csv(file, mode="a", header=False, index=False)
+                st.success("¡Pedido recibido! Estará listo pronto."); st.balloons(); st.rerun()
+
 if st.session_state.auth_role is None:
-    # --- VISTA CLIENTE ---
     if os.path.exists(logo_path):
         b64_logo = get_image_base64(logo_path)
         st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' width='250'></div>", unsafe_allow_html=True)
     
-    mesa = st.text_input("📍 Mesa", "1")
+    mesa = st.text_input("📍 Número de Mesa", "1")
+    carrito = {}
+
     st.markdown("<div class='category-title'>🍔 COMIDA</div>", unsafe_allow_html=True)
-    st.info("Selecciona tus productos...")
-    # Aquí iría el resto del menú de cliente...
+    items_comida = [
+        ("Hamburguer + papas", 350, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500", "c1"),
+        ("Hot Dog Especial", 250, "https://images.unsplash.com/photo-1541214113241-21578d2d9b62?w=500", "c2")
+    ]
+    cols_c = st.columns(2)
+    for i, (name, price, img, k) in enumerate(items_comida):
+        with cols_c[i % 2]:
+            st.markdown(f"<div class='product-card'><img src='{img}' class='product-img'><div class='product-info'><p class='product-name'>{name}</p><p class='product-price'>${price}</p></div></div>", unsafe_allow_html=True)
+            qty = st.number_input("Cantidad", 0, 10, key=k)
+            if qty > 0: carrito[name] = [qty, price, "Comida"]
+
+    st.markdown("<div class='category-title'>🍹 BEBIDAS</div>", unsafe_allow_html=True)
+    items_bebida = [
+        ("Cuba Libre", 150, "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=500", "b1"),
+        ("Cerveza Fria", 150, "https://images.unsplash.com/photo-1618885472179-5e474019f2a9?w=500", "b2")
+    ]
+    cols_b = st.columns(2)
+    for i, (name, price, img, k) in enumerate(items_bebida):
+        with cols_b[i % 2]:
+            st.markdown(f"<div class='product-card'><img src='{img}' class='product-img'><div class='product-info'><p class='product-name'>{name}</p><p class='product-price'>${price}</p></div></div>", unsafe_allow_html=True)
+            qty = st.number_input("Cantidad", 0, 10, key=k)
+            if qty > 0: carrito[name] = [qty, price, "Bebida"]
+
+    if carrito:
+        total = sum(v[0]*v[1] for v in carrito.values())
+        if st.button(f"🛒 VER RESUMEN - ${total}", use_container_width=True): checkout_modal(carrito, mesa)
+
+    st.markdown("""<div class='footer-premium'>
+        <div class='footer-brand'><span>☕</span> Yamb Café</div>
+        <div class='footer-text'>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div>
+        <div class='footer-tagline'>Compra con propósito • Apoya el talento</div>
+    </div>""", unsafe_allow_html=True)
 
 elif st.session_state.auth_role == "login":
-    st.title("🔒 Autenticación")
-    selected_role = st.selectbox("Acceder como:", ["Comida", "Bebida", "Administrador General"])
+    st.title("🔒 Acceso Privado")
+    rol_sel = st.selectbox("Seleccione su Rol", ["Comida", "Bebida", "Administrador General"])
     pin = st.text_input("PIN de seguridad", type="password")
     if st.button("Ingresar"):
         if pin == "1234":
-            st.session_state.auth_role = selected_role
-            st.rerun()
-        else:
-            st.error("PIN inválido")
+            st.session_state.auth_role = rol_sel; st.rerun()
+        else: st.error("PIN inválido")
 
 else:
-    # --- VISTA ADMIN SEGMENTADA ---
     role = st.session_state.auth_role
-    st.title(f"📊 Panel: {role}")
+    st.title(f"📊 Panel de Control: {role}")
     df = pd.read_csv(file) if os.path.exists(file) else pd.DataFrame(columns=columns)
 
     if role == "Comida":
-        st.subheader("Pedidos para Cocina")
+        st.subheader("Pedidos de Cocina")
         st.dataframe(df[df['Categoria'] == 'Comida'], use_container_width=True)
-    
     elif role == "Bebida":
-        st.subheader("Pedidos para Bar")
+        st.subheader("Pedidos de Bar")
         st.dataframe(df[df['Categoria'] == 'Bebida'], use_container_width=True)
-
     elif role == "Administrador General":
-        tab1, tab2 = st.tabs(["💰 Contabilidad", "📋 Historial Total"])
-        with tab1:
+        t1, t2 = st.tabs(["💰 Contabilidad", "📋 Historial Completo"])
+        with t1:
             st.metric("Ventas Totales", f"RD${df['Total'].sum():,.2f}")
-            st.bar_chart(df.groupby('Categoria')['Total'].sum())
-        with tab2:
+            if not df.empty: st.bar_chart(df.groupby('Categoria')['Total'].sum())
+        with t2:
             st.dataframe(df, use_container_width=True)
