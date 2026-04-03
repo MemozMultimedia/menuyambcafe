@@ -102,7 +102,10 @@ with tab_menu:
         total = sum(v[0]*v[1] for v in carrito.values())
         if st.button(f"🛒 VER RESUMEN - ${total}", width="stretch"): checkout_modal(carrito, mesa)
 
-    st.markdown("<div class='footer-box'><h3 style='color:#e63946'>☕ Yamb Café</h3><p>¡Gracias por elegirnos! Tu pedido llegará a tu mesa en unos minutos.</p><p style='font-size: 0.8rem; color: #888;'>© 2024 Yamb Café - Menú Digital</p></div>", unsafe_allow_html=True)
+    st.markdown("""<div class='footer-box'><h3 style='color:#e63946'>☕ Yamb Café</h3>
+    <p>Gracias por tu compra.<br>Cada producto de YAMB tiene un propósito.<br>
+    Con tu compra, apoyas a jóvenes talentos en la música y el arte, ayudándolos a crecer, crear y compartir su pasión con el mundo.</p>
+    <p><b>Compraste con propósito. Apoyaste el talento.</b></p></div>""", unsafe_allow_html=True)
 
 with tab_admin:
     st.title("Pedidos Recibidos")
