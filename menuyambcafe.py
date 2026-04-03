@@ -16,58 +16,63 @@ if not os.path.exists(file_pedidos):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS Mejorado para Alineación de Selector ---
+# --- CSS Grid Responsivo y Profesional ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
     html, body, [class*='st-'] { font-family: 'Inter', sans-serif !important; }
-    .block-container { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+    .block-container { padding-top: 1rem !important; padding-bottom: 2rem !important; max-width: 1200px; }
     header { visibility: hidden; height: 0; }
     footer { visibility: hidden; }
 
-    .stApp { background-color: white; color: #1e1e1e; }
+    .stApp { background-color: #fcfcfc; color: #1e1e1e; }
 
-    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 15px 0; }
-    .logo-img { max-width: 180px; width: 60%; height: auto; }
+    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 20px 0; }
+    .logo-img { max-width: 160px; width: 50%; height: auto; }
 
     .category-title {
         background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%);
-        color: white !important; padding: 12px; border-radius: 15px; text-align: center; margin: 30px 0 20px 0;
-        font-weight: 800; font-size: 1.5rem; text-transform: uppercase;
+        color: white !important; padding: 14px; border-radius: 12px; text-align: center; margin: 40px 0 25px 0;
+        font-weight: 800; font-size: 1.5rem; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* SISTEMA DE CUADRÍCULA RESPONSIVA */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        padding: 10px 0;
+    }
+
+    /* Ajuste para móviles muy pequeños */
+    @media (max-width: 480px) {
+        .product-grid { grid-template-columns: 1fr; gap: 20px; }
     }
 
     .product-card {
-        background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-        margin-bottom: 25px; overflow: hidden; border: 1px solid #eee;
+        background: white; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        overflow: hidden; border: 1px solid #f0f0f0;
         display: flex; flex-direction: column;
-    }
-    .product-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-    .product-info { padding: 15px; text-align: center; flex-grow: 1; }
-    .product-title { font-weight: 800; font-size: 1.2rem; min-height: 3em; margin-bottom: 5px; }
-    .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.3rem; margin-bottom: 10px; }
-
-    /* --- ÁREA DEL SELECTOR ORGANIZADA --- */
-    .selector-container {
-        background: #fcfcfc; border-top: 1px solid #eee; padding: 10px;
+        height: 100%; transition: transform 0.2s;
     }
     
-    [data-testid="column"] {
-        width: calc(33% - 5px) !important; flex: 1 1 calc(33% - 5px) !important; min-width: calc(33% - 5px) !important;
+    .product-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+    .product-info { padding: 18px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .product-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 10px; color: #1e1e1e; }
+    .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.3rem; margin-bottom: 15px; }
+
+    .selector-container {
+        background: #f9f9f9; border-top: 1px solid #eee; padding: 15px;
     }
 
-    div[data-testid="stHorizontalBlock"] {
-        flex-direction: row !important; display: flex !important; flex-wrap: nowrap !important; align-items: center !important;
+    .qty-text { text-align: center; font-weight: 800; font-size: 1.3rem; margin: 0; color: #1e1e1e !important; }
+    
+    .stButton > button {
+        border-radius: 12px !important; height: 45px !important; font-weight: 700 !important;
     }
 
-    .stButton > button { 
-        width: 100% !important; border-radius: 8px !important; height: 40px !important; 
-        border: 1px solid #ddd !important; background: white !important; color: black !important;
-    }
-
-    .qty-text { text-align: center; font-weight: 800; font-size: 1.2rem; margin: 0; pointer-events: none; }
-
-    .footer-premium { padding: 40px 20px; border-radius: 40px 40px 0 0; margin-top: 30px; text-align: center; background: #f9f9f9; border-top: 1px solid #eee; }
-    .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 20px; right: 20px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+    .footer-premium { padding: 50px 20px; border-radius: 40px 40px 0 0; margin-top: 50px; text-align: center; background: #f1f1f1; border-top: 1px solid #ddd; }
+    .whatsapp-float { position: fixed; width: 65px; height: 65px; bottom: 25px; right: 25px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 32px; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 </style>""", unsafe_allow_html=True)
 
 def get_image_base64(path):
@@ -87,9 +92,9 @@ def checkout_modal(mesa):
         if st.form_submit_button("ENVIAR PEDIDO AHORA", use_container_width=True):
             if nombre and cedula:
                 for cat in ["Comida", "Bebida"]:
-                    items = [f"{n} x{v['qty']}" for n,v in st.session_state.carrito.items() if v['cat'] == cat and v['qty'] > 0]
+                    items = [f"{v['name']} x{v['qty']}" for k,v in st.session_state.carrito.items() if v['cat'] == cat and v['qty'] > 0]
                     if items:
-                        subtotal = sum(v['qty']*v['price'] for n,v in st.session_state.carrito.items() if v['cat'] == cat)
+                        subtotal = sum(v['qty']*v['price'] for k,v in st.session_state.carrito.items() if v['cat'] == cat)
                         pd.DataFrame([{"Fecha": datetime.now().strftime("%H:%M"), "Mesa": mesa, "Cliente": nombre, "Pedido": ", ".join(items), "Total": subtotal, "Categoria": cat, "Estado": "Pendiente"}]).to_csv(file_pedidos, mode="a", header=False, index=False)
                 st.session_state.carrito = {}
                 st.success("¡Gracias por elegirnos!"); st.balloons(); st.rerun()
@@ -109,15 +114,15 @@ if st.session_state.auth_role is None:
 
     if os.path.exists(file_menu):
         df_menu = pd.read_csv(file_menu)
-        df_menu = df_menu.sort_values(by=['Categoria', 'Nombre'], ascending=[False, True])
-        
         for cat in ["Comida", "Bebida"]:
             st.markdown(f"<div class='category-title'>{'🍔' if cat=='Comida' else '🍹'} {cat.upper()}</div>", unsafe_allow_html=True)
+            
             items = df_menu[df_menu['Categoria'] == cat]
+            
+            # Uso de columnas de Streamlit para el flujo visual
             cols = st.columns(2)
             for i, row in enumerate(items.itertuples()):
                 with cols[i % 2]:
-                    # Estructura de tarjeta con área de selector separada
                     st.markdown(f"""<div class='product-card'>
                         <img src='{row.Imagen}' class='product-img'>
                         <div class='product-info'>
@@ -134,12 +139,12 @@ if st.session_state.auth_role is None:
                             st.markdown("<div class='selector-container'>", unsafe_allow_html=True)
                             q1, q2, q3 = st.columns([1,1,1])
                             with q1: 
-                                if st.button("➖", key=f"min_{row.Index}"): 
+                                if st.button("➖", key=f"min_{row.Index}"):
                                     st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
                                     st.rerun()
                             with q2: st.markdown(f"<p class='qty-text'>{st.session_state.carrito[item_key]['qty']}</p>", unsafe_allow_html=True)
                             with q3: 
-                                if st.button("➕", key=f"plus_{row.Index}"): 
+                                if st.button("➕", key=f"plus_{row.Index}"):
                                     st.session_state.carrito[item_key]['qty'] += 1
                                     st.rerun()
                             st.markdown("</div>", unsafe_allow_html=True)
@@ -147,10 +152,10 @@ if st.session_state.auth_role is None:
 
     total_final = sum(v['qty']*v['price'] for v in st.session_state.carrito.values())
     if total_final > 0:
-        if st.button(f"🛒 FINALIZAR PEDIDO - RD${total_final}", use_container_width=True, type="primary"): 
-            checkout_modal(mesa)
+        st.write("")
+        if st.button(f"🛒 FINALIZAR PEDIDO - RD${total_final}", use_container_width=True, type="primary"): checkout_modal(mesa)
 
-    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div><div class='footer-tagline'>Compra con propósito • Apoya el talento</div></div>""", unsafe_allow_html=True)
+    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div>Apoya a jóvenes talentos en la música y el arte.</div></div>""", unsafe_allow_html=True)
 
 elif st.session_state.auth_role == "login":
     st.subheader("🔒 Acceso Administrativo")
@@ -162,13 +167,4 @@ elif st.session_state.auth_role == "login":
 else:
     st.title(f"📊 Gestión: {st.session_state.auth_role}")
     df_p = pd.read_csv(file_pedidos)
-    if st.session_state.auth_role == "Administrador General":
-        st.data_editor(df_p, use_container_width=True, hide_index=True)
-    else:
-        mask = (df_p['Categoria'] == st.session_state.auth_role)
-        filtered = df_p[mask]
-        edited = st.data_editor(filtered, use_container_width=True, disabled=["Fecha", "Mesa", "Cliente", "Pedido", "Total", "Categoria"], hide_index=True)
-        if st.button("✅ Sincronizar Entregas", use_container_width=True):
-            df_p.update(edited)
-            df_p.to_csv(file_pedidos, index=False)
-            st.success("Sincronizado"); st.rerun()
+    st.data_editor(df_p, use_container_width=True)
