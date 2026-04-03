@@ -25,13 +25,13 @@ st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
-    /* FUERZA COLOR NEGRO EN TODO EL APP PARA LEGIBILIDAD */
+    /* FUERZA COLOR BLANCO EN TODO EL APP POR SOLICITUD DEL USUARIO */
     html, body, [class*='st-'], .stMarkdown, p, label, span, div, li, input, button, select {
         font-family: 'Inter', sans-serif !important;
-        color: #000000 !important;
+        color: #ffffff !important;
     }
 
-    .stApp { background-color: #ffffff !important; }
+    .stApp { background-color: #000000 !important; } /* Cambiando fondo a negro para que el texto blanco sea legible */
     [data-testid="stSidebar"] { display: none; }
     
     /* REDUCCIÓN DE ESPACIO SUPERIOR */
@@ -39,8 +39,8 @@ st.markdown("""<style>
 
     /* SELECTOR DE ADMINISTRADORES */
     div[data-baseweb="select"] * {
-        color: #000000 !important;
-        background-color: #ffffff !important;
+        color: #ffffff !important;
+        background-color: #333333 !important;
     }
 
     div[data-baseweb="select"] {
@@ -56,18 +56,18 @@ st.markdown("""<style>
     }
 
     .product-card {
-        background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.07);
-        text-align: center; margin-bottom: 30px; border: 1px solid #f0f0f0; overflow: hidden;
+        background: #1e1e1e; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        text-align: center; margin-bottom: 30px; border: 1px solid #333; overflow: hidden;
     }
 
     .product-img { width: 100%; height: 220px; object-fit: cover; }
     .product-info { padding: 15px; }
-    .product-name { color: #000000 !important; font-weight: 700; font-size: 1.2rem; min-height: 2.5em; display: flex; align-items: center; justify-content: center; }
+    .product-name { color: #ffffff !important; font-weight: 700; font-size: 1.2rem; min-height: 2.5em; display: flex; align-items: center; justify-content: center; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }
 
     .footer-premium {
-        background: #f9f9f9; padding: 60px 20px; border-radius: 40px 40px 0 0;
-        margin-top: 80px; text-align: center; border-top: 1px solid #eee;
+        background: #111111; padding: 60px 20px; border-radius: 40px 40px 0 0;
+        margin-top: 80px; text-align: center; border-top: 1px solid #333;
     }
 
     .whatsapp-float {
@@ -81,10 +81,10 @@ st.markdown("""<style>
         max-width: 500px; 
         margin: 0 auto; 
         padding: 40px; 
-        background: #ffffff; 
+        background: #1e1e1e; 
         border-radius: 20px; 
-        border: 1px solid #dddddd; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        border: 1px solid #444444; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
     }
 </style>""", unsafe_allow_html=True)
 
@@ -170,7 +170,7 @@ else:
         t1, t2 = st.tabs(["💰 Contabilidad", "📋 Historial"])
         with t1:
             st.metric("Ventas Totales", f"RD${df_adm['Total'].sum():,.2f}")
-            if not df_adm.empty: st.bar_chart(df_adm.groupby('Categoria')['Total'].sum())
+            if not df_adm.empty: st.bar_chart(df_agg_total = df_adm.groupby('Categoria')['Total'].sum())
         with t2: st.dataframe(df_adm, use_container_width=True)
     else:
         st.dataframe(df_adm[df_adm['Categoria'] == st.session_state.auth_role], use_container_width=True)
