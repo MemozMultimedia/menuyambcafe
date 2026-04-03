@@ -21,7 +21,7 @@ if not os.path.exists(file):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- Estilos CSS Ultra-Visibilidad ---
+# --- Estilos CSS Ultra-Visibilidad (Texto Blanco sobre Fondo Negro) ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
@@ -31,7 +31,7 @@ st.markdown("""<style>
         color: #ffffff !important;
     }
 
-    .stApp { background-color: #000000 !important; } /* Cambiando fondo a negro para que el texto blanco sea legible */
+    .stApp { background-color: #000000 !important; }
     [data-testid="stSidebar"] { display: none; }
     
     /* REDUCCIÓN DE ESPACIO SUPERIOR */
@@ -44,7 +44,7 @@ st.markdown("""<style>
     }
 
     div[data-baseweb="select"] {
-        border: 2px solid #e6e6e6 !important;
+        border: 2px solid #ffffff !important;
         border-radius: 10px !important;
     }
 
@@ -76,7 +76,6 @@ st.markdown("""<style>
         display: flex; justify-content: center; align-items: center; font-size: 32px; z-index: 9999;
     }
 
-    /* CLASE ADMIN-BOX PARA EL LOGIN */
     .admin-box { 
         max-width: 500px; 
         margin: 0 auto; 
