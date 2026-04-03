@@ -69,7 +69,7 @@ st.markdown("""<style>
     .footer-text { color: #444 !important; font-size: 1.1rem; }
     .footer-tagline { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #e63946; letter-spacing: 2px; padding-top: 20px; border-top: 1px solid #eee; display: inline-block; }
 
-    .whatsapp-float {
+    .whatsapp-float { 
         position: fixed; width: 65px; height: 65px; bottom: 30px; right: 30px;
         background: #25d366; color: white !important; border-radius: 50px;
         display: flex; justify-content: center; align-items: center;
@@ -116,10 +116,24 @@ if st.session_state.auth_role is None:
     
     mesa = st.text_input("📍 Número de Mesa", "1")
     carrito = {}
+
     st.markdown("<div class='category-title'>🍔 COMIDA</div>", unsafe_allow_html=True)
-    # (Food logic here...)
+    c_col1, c_col2 = st.columns(2)
+    items_c = [("Hamburguer + papas", 350, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600", "c1"), ("Hot Dog Especial", 250, "https://images.unsplash.com/photo-1541214113241-21578d2d9b62?w=600", "c2")]
+    for col, (name, price, img, k) in zip([c_col1, c_col2], items_c):
+        with col:
+            st.markdown(f"<div class='product-card'><img src='{img}' class='product-img'><div class='product-info'><p class='product-name'>{name}</p><p class='product-price'>${price}</p></div></div>", unsafe_allow_html=True)
+            qty = st.number_input("Cantidad", 0, 10, key=k)
+            if qty > 0: carrito[name] = [qty, price, "Comida"]
+
     st.markdown("<div class='category-title'>🍹 BEBIDAS</div>", unsafe_allow_html=True)
-    # (Drinks logic here...)
+    b_col1, b_col2 = st.columns(2)
+    items_b = [("Cuba Libre", 150, "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600", "b1"), ("Cerveza Fria", 150, "https://images.unsplash.com/photo-1618885472179-5e474019f2a9?w=600", "b2")]
+    for col, (name, price, img, k) in zip([b_col1, b_col2], items_b):
+        with col:
+            st.markdown(f"<div class='product-card'><img src='{img}' class='product-img'><div class='product-info'><p class='product-name'>{name}</p><p class='product-price'>${price}</p></div></div>", unsafe_allow_html=True)
+            qty = st.number_input("Cantidad", 0, 10, key=k)
+            if qty > 0: carrito[name] = [qty, price, "Bebida"]
     
     if carrito:
         total = sum(v[0]*v[1] for v in carrito.values())
@@ -132,9 +146,25 @@ if st.session_state.auth_role is None:
     </div>""", unsafe_allow_html=True)
 
 elif st.session_state.auth_role == "login":
-    # (Login UI here...)
-    pass
+    st.title("🔒 Acceso Administrativo")
+    selected_role = st.selectbox("Acceder como:", ["Comida", "Bebida", "Administrador General"])
+    pin = st.text_input("PIN de seguridad", type="password")
+    if st.button("Ingresar"):
+        if pin == "1234":
+            st.session_state.auth_role = selected_role; st.rerun()
+        else: st.error("PIN inválido")
 
 else:
-    # (Admin UI here...)
-    pass
+    role = st.session_state.auth_role
+    st.title(f"📊 Panel: {role}")
+    df = pd.read_csv(file) if os.path.exists(file) else pd.DataFrame(columns=columns)
+    if role == "Comida":
+        st.dataframe(df[df['Categoria'] == 'Comida'], use_container_width=True)
+    elif role == "Bebida":
+        st.dataframe(df[df['Categoria'] == 'Bebida'], use_container_width=True)
+    elif role == "Administrador General":
+        t1, t2 = st.tabs(["💰 Contabilidad", "📋 Historial"])
+        with t1:
+            st.metric("Ventas Totales", f"RD${df['Total'].sum():,.2f}")
+            if not df.empty: st.bar_chart(df.groupby('Categoria')['Total'].sum())
+        with t2: st.dataframe(df, use_container_width=True)
