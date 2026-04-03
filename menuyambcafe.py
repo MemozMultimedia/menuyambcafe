@@ -16,7 +16,7 @@ if not os.path.exists(file_pedidos):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS UI Refinado ---
+# --- CSS UI Mejorado ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
@@ -43,30 +43,38 @@ st.markdown("""<style>
     .product-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; color: #1e1e1e; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.2rem; }
 
-    /* FORCED TIGHT HORIZONTAL SELECTOR */
-    [data-testid="stHorizontalBlock"] {
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 0.5rem !important;
+    /* STYLED PILL QUANTITY SELECTOR */
+    .qty-pill {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f1f1;
+        border-radius: 30px;
+        padding: 5px 15px;
+        width: fit-content;
+        margin: 10px auto;
+        gap: 10px;
     }
 
     .qty-display {
         font-weight: 800;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         color: #1e1e1e;
+        min-width: 30px;
         text-align: center;
-        line-height: 40px;
     }
 
+    /* Clean transparent buttons for the pill selector */
     .stButton > button {
-        border-radius: 50% !important;
-        width: 40px !important;
-        height: 40px !important;
-        padding: 0 !important;
-        background-color: #f1f1f1 !important;
+        background: transparent !important;
+        border: none !important;
         color: #e63946 !important;
-        border: 1px solid #ddd !important;
-        font-size: 1.2rem !important;
+        font-size: 1.6rem !important;
+        font-weight: bold !important;
+        padding: 0 !important;
+        width: 35px !important;
+        height: 35px !important;
+        box-shadow: none !important;
     }
 
     .footer-premium { padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 50px; text-align: center; background: #eee; }
@@ -120,7 +128,8 @@ if st.session_state.auth_role is None:
                         item_key = f"item_{row.Index}"
                         if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
                         
-                        # Forced Compact Horizontal Layout
+                        # Compact Horizontal Pill Selector
+                        st.markdown("<div class='qty-pill'>", unsafe_allow_html=True)
                         cq1, cq2, cq3 = st.columns([1, 1, 1])
                         with cq1: 
                             if st.button("−", key=f"btn_m_{row.Index}"):
@@ -132,6 +141,7 @@ if st.session_state.auth_role is None:
                             if st.button("+", key=f"btn_p_{row.Index}"):
                                 st.session_state.carrito[item_key]['qty'] += 1
                                 st.rerun()
+                        st.markdown("</div>", unsafe_allow_html=True)
                     else: st.error("Agotado")
 
     total_final = sum(v['qty']*v['price'] for v in st.session_state.carrito.values())
