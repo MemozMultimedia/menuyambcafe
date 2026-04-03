@@ -55,7 +55,7 @@ st.markdown("""<style>
         display: flex; flex-direction: column;
         height: 100%; transition: transform 0.2s;
     }
-    
+
     .product-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
     .product-info { padding: 18px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
     .product-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 10px; color: #1e1e1e; }
@@ -66,7 +66,7 @@ st.markdown("""<style>
     }
 
     .qty-text { text-align: center; font-weight: 800; font-size: 1.3rem; margin: 0; color: #1e1e1e !important; }
-    
+
     .stButton > button {
         border-radius: 12px !important; height: 45px !important; font-weight: 700 !important;
     }
@@ -76,7 +76,7 @@ st.markdown("""<style>
 </style>""", unsafe_allow_html=True)
 
 def get_image_base64(path):
-    if os.path.exists(path): 
+    if os.path.exists(path):
         with open(path, "rb") as f: return base64.b64encode(f.read()).decode()
     return ""
 
@@ -102,7 +102,7 @@ def checkout_modal(mesa):
 c_t1, c_t2 = st.columns([10, 1])
 with c_t2:
     icon = "🔐" if st.session_state.auth_role is None else "📋"
-    if st.button(icon): 
+    if st.button(icon):
         st.session_state.auth_role = "login" if st.session_state.auth_role is None else None
         st.rerun()
 
@@ -138,12 +138,12 @@ if st.session_state.auth_role is None:
                         with st.container():
                             st.markdown("<div class='selector-container'>", unsafe_allow_html=True)
                             q1, q2, q3 = st.columns([1,1,1])
-                            with q1: 
+                            with q1:
                                 if st.button("➖", key=f"min_{row.Index}"):
                                     st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
                                     st.rerun()
                             with q2: st.markdown(f"<p class='qty-text'>{st.session_state.carrito[item_key]['qty']}</p>", unsafe_allow_html=True)
-                            with q3: 
+                            with q3:
                                 if st.button("➕", key=f"plus_{row.Index}"):
                                     st.session_state.carrito[item_key]['qty'] += 1
                                     st.rerun()
