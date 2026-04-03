@@ -8,9 +8,22 @@ from datetime import datetime
 logo_path = "Vector Smart Object.png"
 file = "pedidos.csv"
 whatsapp_number = "1234567890"
+columns = ["Fecha", "Mesa", "Cliente", "Pedido", "Total", "Categoria"]
 
+# Robust CSV Check: Ensure file exists and has all required columns
 if not os.path.exists(file):
-    pd.DataFrame(columns=["Fecha", "Mesa", "Cliente", "Pedido", "Total", "Categoria"]).to_csv(file, index=False)
+    pd.DataFrame(columns=columns).to_csv(file, index=False)
+else:
+    try:
+        df_check = pd.read_csv(file)
+        # If 'Categoria' is missing (common cause of your error), recreate or fix it
+        if "Categoria" not in df_check.columns:
+            for col in columns:
+                if col not in df_check.columns:
+                    df_check[col] = "Desconocido"
+            df_check.to_csv(file, index=False)
+    except:
+        pd.DataFrame(columns=columns).to_csv(file, index=False)
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
@@ -18,7 +31,6 @@ st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
-    /* Eliminar el sidebar y espacios extra */
     [data-testid="stSidebar"] { display: none; }
     .block-container { padding-top: 1rem; padding-bottom: 0rem; }
     
@@ -27,7 +39,6 @@ st.markdown("""<style>
 
     .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding-bottom: 10px; }
 
-    /* Icono Moderno de Cambio de Vista */
     .admin-toggle { position: fixed; top: 20px; right: 20px; z-index: 1000; cursor: pointer; background: white; padding: 10px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #eee; transition: 0.3s; }
     .admin-toggle:hover { transform: scale(1.1); }
 
@@ -49,15 +60,13 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# --- Control de Estado --- 
 if 'admin_mode' not in st.session_state:
     st.session_state.admin_mode = False
 
-# WhatsApp Button
 whatsapp_link = f"https://wa.me/{whatsapp_number}?text=Hola!%20Vengo%20desde%20el%20menu%20digital."
 st.markdown(f"""<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'><a href='{whatsapp_link}' class='whatsapp-float' target='_blank'><i class='fab fa-whatsapp'></i></a>""", unsafe_allow_html=True)
 
-# Botón Moderno de Cambio
+# Icon Toggle Button
 col_t1, col_t2 = st.columns([10, 1])
 with col_t2:
     if not st.session_state.admin_mode:
@@ -87,7 +96,6 @@ def checkout_modal(carrito, mesa):
                 st.rerun()
 
 if not st.session_state.admin_mode:
-    # VISTA CLIENTE
     if os.path.exists(logo_path):
         b64_logo = get_image_base64(logo_path)
         st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' width='250'></div>", unsafe_allow_html=True)
@@ -132,16 +140,17 @@ if not st.session_state.admin_mode:
         <div class='footer-text'>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div>
         <div class='footer-tagline'>Compra con propósito • Apoya el talento</div>
     </div>""", unsafe_allow_html=True)
-
 else:
-    # VISTA ADMIN
     st.title("🔒 Panel de Administración")
     tab_comida, tab_bebida = st.tabs(["🍔 Comida", "🍹 Bebida"])
     if os.path.exists(file):
         df_admin = pd.read_csv(file)
-        with tab_comida:
-            st.subheader("Pedidos de Comida")
-            st.dataframe(df_admin[df_admin['Categoria'] == 'Comida'], use_container_width=True)
-        with tab_bebida:
-            st.subheader("Pedidos de Bebida")
-            st.dataframe(df_admin[df_admin['Categoria'] == 'Bebida'], use_container_width=True)
+        if not df_admin.empty and "Categoria" in df_admin.columns:
+            with tab_comida:
+                st.subheader("Pedidos de Comida")
+                st.dataframe(df_admin[df_admin['Categoria'] == 'Comida'], use_container_width=True)
+            with tab_bebida:
+                st.subheader("Pedidos de Bebida")
+                st.dataframe(df_admin[df_admin['Categoria'] == 'Bebida'], use_container_width=True)
+        else:
+            st.info("No hay pedidos registrados con categorías válidas todavía.")
