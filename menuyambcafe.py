@@ -81,6 +81,9 @@ st.markdown("""<style>
 
     .footer-premium { padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 50px; text-align: center; background: #fff; border-top: 1px solid #eee; }
     .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 25px; right: 25px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 9999; box-shadow: 0 8px 15px rgba(37, 211, 102, 0.3); }
+    
+    /* Grid Responsive: 2 col desktop, 1 col mobile */
+    [data-testid="stHorizontalBlock"] { gap: 1rem; }
 </style>""", unsafe_allow_html=True)
 
 if 'carrito' not in st.session_state: st.session_state.carrito = {}
@@ -115,6 +118,8 @@ if st.session_state.auth_role is None:
         for cat in ["Comida", "Bebida"]:
             st.markdown(f"<div class='category-title'>{'🍔' if cat=='Comida' else '🍹'} {cat.upper()}</div>", unsafe_allow_html=True)
             items = df_menu[df_menu['Categoria'] == cat]
+            
+            # Logic for Responsive Grid (2 columns on Desktop, handled by Streamlit naturally in wide mode)
             cols = st.columns(2)
             for i, row in enumerate(items.itertuples()):
                 with cols[i % 2]:
