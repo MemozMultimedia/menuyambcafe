@@ -33,18 +33,28 @@ st.markdown("""<style>
     img { border-radius: 10px; }
 </style>""", unsafe_allow_html=True)
 
-# --- Inicialización de Estado para el 'Pop-up' ---
-if 'confirmando' not in st.session_state:
-    st.session_state.confirmando = False
+# --- Función para el Pop-up (Modal) ---
+@st.dialog("📝 Finalizar Pedido")
+def confirmar_pedido_modal(carrito, mesa):
+    st.write("Por favor, ingresa tus datos para procesar la orden:")
+    with st.form("form_datos_modal"):
+        nombre_cli = st.text_input("Nombre Completo")
+        cedula_cli = st.text_input("Cédula")
+        if st.form_submit_button("ENVIAR AHORA", use_container_width=True):
+            if nombre_cli and cedula_cli:
+                # Aquí se guardaría en CSV en una versión completa
+                st.success(f"✅ ¡Gracias {nombre_cli}! Pedido enviado para la mesa {mesa}.")
+                st.balloons()
+                st.rerun()
+            else:
+                st.error("Ambos campos son obligatorios.")
 
 tab_menu, tab_admin = st.tabs(['📋 CARTA INTERACTIVA', '🔒 ADMINISTRACIÓN'])
 
-# Logo y placeholder de imagen
 logo_path = 'Vector Smart Object.png'
 img_placeholder = "https://via.placeholder.com/150"
 
 with tab_menu:
-    # Logo Centrado
     col_l1, col_l2, col_l3 = st.columns([1,1,1])
     with col_l2:
         if os.path.exists(logo_path): 
@@ -52,13 +62,12 @@ with tab_menu:
         else:
             st.markdown("<h1 style='text-align: center;'>YAMB CAFÉ</h1>", unsafe_allow_html=True)
 
-    mesa = st.text_input("Número de Mesa", "1")
+    mesa = st.text_input("Mesa", "1")
     carrito = {}
 
-    # --- SECCIÓN: COMIDAS ---
-    st.markdown("<div class='category-header'>🍔 SECCIÓN COMIDAS</div>", unsafe_allow_html=True)
+    # --- CATEGORÍA: COMIDA ---
+    st.markdown("<div class='category-header'>🍔 COMIDA</div>", unsafe_allow_html=True)
     cf1, cf2, cf3 = st.columns(3)
-    
     with cf1:
         st.markdown("<div class='product-card'>", unsafe_allow_html=True)
         st.image(img_placeholder, use_container_width=True)
@@ -66,7 +75,6 @@ with tab_menu:
         qty1 = st.number_input("Cantidad", 0, 10, key='f1')
         if qty1 > 0: carrito['Burguer + Papas'] = [qty1, 350]
         st.markdown("</div>", unsafe_allow_html=True)
-
     with cf2:
         st.markdown("<div class='product-card'>", unsafe_allow_html=True)
         st.image(img_placeholder, use_container_width=True)
@@ -74,7 +82,6 @@ with tab_menu:
         qty2 = st.number_input("Cantidad", 0, 10, key='f2')
         if qty2 > 0: carrito['Hot Dog Especial'] = [qty2, 250]
         st.markdown("</div>", unsafe_allow_html=True)
-
     with cf3:
         st.markdown("<div class='product-card'>", unsafe_allow_html=True)
         st.image(img_placeholder, use_container_width=True)
@@ -83,10 +90,9 @@ with tab_menu:
         if qty3 > 0: carrito['Pizza Personal'] = [qty3, 300]
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- SECCIÓN: BEBIDAS ---
-    st.markdown("<div class='category-header'>☕ SECCIÓN BEBIDAS</div>", unsafe_allow_html=True)
+    # --- CATEGORÍA: BEBIDA ---
+    st.markdown("<div class='category-header'>☕ BEBIDA</div>", unsafe_allow_html=True)
     cb1, cb2, cb3 = st.columns(3)
-
     with cb1:
         st.markdown("<div class='product-card'>", unsafe_allow_html=True)
         st.image(img_placeholder, use_container_width=True)
@@ -94,7 +100,6 @@ with tab_menu:
         qty_b1 = st.number_input("Cantidad", 0, 10, key='b1')
         if qty_b1 > 0: carrito['Cappuccino'] = [qty_b1, 180]
         st.markdown("</div>", unsafe_allow_html=True)
-
     with cb2:
         st.markdown("<div class='product-card'>", unsafe_allow_html=True)
         st.image(img_placeholder, use_container_width=True)
@@ -102,7 +107,6 @@ with tab_menu:
         qty_b2 = st.number_input("Cantidad", 0, 10, key='b2')
         if qty_b2 > 0: carrito['Cerveza One'] = [qty_b2, 100]
         st.markdown("</div>", unsafe_allow_html=True)
-
     with cb3:
         st.markdown("<div class='product-card'>", unsafe_allow_html=True)
         st.image(img_placeholder, use_container_width=True)
@@ -115,23 +119,8 @@ with tab_menu:
     if carrito:
         total = sum(v[0]*v[1] for v in carrito.values())
         st.markdown(f"<h3 style='text-align: right;'>Total: RD${total}</h3>", unsafe_allow_html=True)
-        
         if st.button("CONFIRMAR PEDIDO", use_container_width=True, type='primary'):
-            st.session_state.confirmando = True
-
-        # --- 'Pop-up' de Datos del Cliente ---
-        if st.session_state.confirmando:
-            with st.expander("📝 FINALIZAR PEDIDO: Ingresa tus datos", expanded=True):
-                with st.form("form_datos"):
-                    nombre_cli = st.text_input("Nombre Completo")
-                    cedula_cli = st.text_input("Cédula")
-                    if st.form_submit_button("ENVIAR AHORA"):
-                        if nombre_cli and cedula_cli:
-                            st.success(f"✅ ¡Gracias {nombre_cli}! Pedido enviado.")
-                            st.balloons()
-                            st.session_state.confirmando = False
-                        else:
-                            st.error("Por favor completa ambos campos.")
+            confirmar_pedido_modal(carrito, mesa)
 
 with tab_admin:
-    st.info("Panel administrativo en desarrollo")
+    st.info("Panel administrativo")
