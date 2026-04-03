@@ -6,21 +6,29 @@ import base64
 
 st.set_page_config(page_title="YAMB CAFE", layout="wide")
 
-# ================== FONDO CON TU IMAGEN ==================
+# ================== FONDO CON MANEJO DE ERROR ==================
 def set_bg(image_file):
     if os.path.exists(image_file):
-        with open(image_file, "rb") as img:
-            encoded = base64.b64encode(img.read()).decode()
-        st.markdown(f"""
-        <style>
-        .stApp {{
-            background-image: url("data:image/png;base64,{encoded}");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }}
-        </style>
-        """, unsafe_allow_html=True)
+        try:
+            with open(image_file, "rb") as img:
+                encoded = base64.b64encode(img.read()).decode()
+            st.markdown(f"""
+            <style>
+            .stApp {{
+                background-image: url("data:image/png;base64,{encoded}");
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
+        except Exception as e:
+            st.warning(f"Error al cargar la imagen de fondo: {e}")
+            # Fallback a fondo oscuro si hay error de lectura
+            st.markdown("<style>.stApp { background-color: #121212; }</style>", unsafe_allow_html=True)
+    else:
+        # Fallback silencioso a fondo oscuro si el archivo no existe
+        st.markdown("<style>.stApp { background-color: #121212; }</style>", unsafe_allow_html=True)
 
 set_bg("menu.png")
 
@@ -58,33 +66,22 @@ h1, h2, h3, p, span, label {
     font-size: 1.2rem;
 }
 
-/* Estilo para los inputs */
 input {
     background-color: rgba(255,255,255,0.1) !important;
     color: white !important;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
-# ================== BASE DE DATOS ==================
 file = "pedidos.csv"
 if not os.path.exists(file):
     df = pd.DataFrame(columns=["Fecha", "Mesa", "Pedido", "Total", "Pago"])
     df.to_csv(file, index=False)
 
-# ================== MENU ==================
 menu = {
-    "CUBA LIBRE": 150,
-    "VODKA NARANJA": 150,
-    "PRESIDENTE": 150,
-    "ONE": 100,
-    "HEINEKEN": 230,
-    "REFRESCO": 60,
-    "AGUA": 25,
-    "HAMBURGER + PAPAS": 350,
-    "HOT DOG": 200,
-    "HOT DOG + PAPAS": 250
+    "CUBA LIBRE": 150, "VODKA NARANJA": 150, "PRESIDENTE": 150, "ONE": 100,
+    "HEINEKEN": 230, "REFRESCO": 60, "AGUA": 25,
+    "HAMBURGER + PAPAS": 350, "HOT DOG": 200, "HOT DOG + PAPAS": 250
 }
 
 tab_menu, tab_admin = st.tabs(["🔥 MENU", "🔒 ADMIN"])
@@ -92,7 +89,6 @@ tab_menu, tab_admin = st.tabs(["🔥 MENU", "🔒 ADMIN"])
 with tab_menu:
     st.title("🔥 YAMB CAFE MENU")
     mesa = st.text_input("Número de mesa", "1")
-
     carrito = []
 
     for item, precio in menu.items():
@@ -103,9 +99,7 @@ with tab_menu:
             cantidad = st.number_input("", 0, 10, 0, key=item)
         with col3:
             st.markdown(f"<p class='price-tag'>RD${precio}</p>", unsafe_allow_html=True)
-
-        if cantidad > 0:
-            carrito.append((item, cantidad, precio))
+        if cantidad > 0: carrito.append((item, cantidad, precio))
 
     total = sum(c * p for _, c, p in carrito)
     st.markdown(f"## 💰 Total: RD${total}")
