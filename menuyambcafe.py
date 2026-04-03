@@ -21,17 +21,28 @@ if not os.path.exists(file):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- Estilos CSS Profesionales ---
+# --- Estilos CSS Profesionales con Fix de Visibilidad ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
-    /* Fondo Blanco y Texto Negro */
+    /* Fondo Blanco y Texto Negro General */
     .stApp { background-color: #ffffff !important; }
-    html, body, [class*='st-'], p, label, span, div, input, select { 
+    html, body, [class*='st-'], p, label, span, div, input { 
         font-family: 'Inter', sans-serif !important; 
         color: #000000 !important; 
     }
 
+    /* FORZAR VISIBILIDAD EN SELECTBOX */
+    div[data-baseweb="select"] { 
+        background-color: white !important; 
+        border: 1px solid #cccccc !important;
+        border-radius: 8px !important;
+    }
+    div[data-baseweb="select"] * { 
+        color: black !important; 
+        background-color: white !important;
+    }
+    
     /* Eliminar espacios superiores */
     .block-container { padding-top: 1rem !important; }
     [data-testid="stSidebar"] { display: none; }
@@ -40,7 +51,7 @@ st.markdown("""<style>
     .category-title {
         background: #e63946;
         color: white !important;
-        padding: 12px; border-radius: 10px; text-align: center; margin: 20px 0;
+        padding: 12px; border-radius: 10px; text-align: center; margin: 25px 0;
         font-weight: 800; font-size: 1.4rem; text-transform: uppercase;
     }
 
@@ -141,12 +152,12 @@ if st.session_state.auth_role is None:
     st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div style='margin:15px 0'>Cada producto apoya a jóvenes talentos en la música y el arte.</div><div class='footer-tagline'>Compra con propósito • Apoya el talento</div></div>""", unsafe_allow_html=True)
 
 elif st.session_state.auth_role == "login":
-    # LOGIN ADMIN SIN ESPACIOS
+    # LOGIN ADMIN
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("<div class='admin-box'>", unsafe_allow_html=True)
     st.subheader("🔒 Acceso Personal")
-    rol_sel = st.selectbox("Rol", ["Comida", "Bebida", "Administrador General"])
-    pin = st.text_input("PIN", type="password")
+    rol_sel = st.selectbox("Seleccione su Rol", ["Comida", "Bebida", "Administrador General"])
+    pin = st.text_input("Ingrese su PIN", type="password")
     if st.button("Entrar", use_container_width=True):
         if pin == ROLES_CONFIG.get(rol_sel): st.session_state.auth_role = rol_sel; st.rerun()
         else: st.error("PIN incorrecto")
