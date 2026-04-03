@@ -43,21 +43,23 @@ st.markdown("""<style>
     .product-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; color: #1e1e1e; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.2rem; }
 
-    /* SELECTOR MOBILE OPTIMIZED */
-    .selector-container {
-        background: #f1f1f1; border-radius: 0 0 20px 20px; padding: 10px;
-        display: flex; justify-content: center; align-items: center; gap: 5px;
+    /* FIXED ALIGNMENT FOR QUANTITY SELECTOR */
+    [data-testid="stHorizontalBlock"] {
+        align-items: center !important;
+        justify-content: center !important;
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 10px !important;
     }
 
     .qty-text {
-        min-width: 40px; text-align: center; font-weight: 800; font-size: 1.2rem;
+        min-width: 40px; text-align: center; font-weight: 800; font-size: 1.4rem;
         margin: 0 !important; color: #1e1e1e !important; line-height: 1;
     }
 
-    /* Reducir tamaño de botones en mobile para que quepan en una fila */
     .stButton > button {
         border-radius: 10px !important; width: 100% !important; padding: 0 !important;
-        min-height: 35px !important; font-size: 1rem !important;
+        min-height: 40px !important; font-size: 1.2rem !important;
     }
 
     .footer-premium { padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 50px; text-align: center; background: #eee; }
@@ -110,10 +112,10 @@ if st.session_state.auth_role is None:
                     if row.Disponible:
                         item_key = f"item_{row.Index}"
                         if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
-                        
-                        # Selector de una sola fila
+
+                        # Selector de una sola fila con alineación corregida
                         c_q1, c_q2, c_q3 = st.columns([1,1,1])
-                        with c_q1: 
+                        with c_q1:
                             if st.button("➖", key=f"m_{row.Index}"):
                                 st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
                                 st.rerun()
