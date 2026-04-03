@@ -21,7 +21,11 @@ st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
     
     html, body, [class*='st-'] { font-family: 'Inter', sans-serif !important; }
-    .block-container { padding-top: 1rem !important; }
+
+    /* ELIMINAR ESPACIOS DE SOBRA ARRIBA Y ABAJO */
+    .block-container { padding-top: 0rem !important; padding-bottom: 0rem !important; }
+    header { visibility: hidden; height: 0; }
+    footer { visibility: hidden; }
 
     /* LOGO REDUCIDO Y CENTRADO */
     .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 10px 0; }
@@ -47,7 +51,7 @@ st.markdown("""<style>
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }
     
     /* PIE DE PAGINA */
-    .footer-premium { padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 60px; text-align: center; }
+    .footer-premium { padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 20px; text-align: center; }
     .footer-brand { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
 
     .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 30px; right: 30px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
