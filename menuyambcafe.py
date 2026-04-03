@@ -43,43 +43,30 @@ st.markdown("""<style>
     .product-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; color: #1e1e1e; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.2rem; }
 
-    /* COMPACT HORIZONTAL SELECTOR */
-    .qty-control-row {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        margin: 15px 0;
+    /* FORCED TIGHT HORIZONTAL SELECTOR */
+    [data-testid="stHorizontalBlock"] {
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
     }
 
     .qty-display {
         font-weight: 800;
         font-size: 1.5rem;
         color: #1e1e1e;
-        min-width: 30px;
         text-align: center;
+        line-height: 40px;
     }
 
-    /* Streamlit button style override for circle look */
     .stButton > button {
         border-radius: 50% !important;
         width: 40px !important;
         height: 40px !important;
         padding: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
         background-color: #f1f1f1 !important;
         color: #e63946 !important;
         border: 1px solid #ddd !important;
         font-size: 1.2rem !important;
-        transition: 0.2s;
-    }
-
-    .stButton > button:hover {
-        background-color: #e63946 !important;
-        color: white !important;
-        border-color: #e63946 !important;
     }
 
     .footer-premium { padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 50px; text-align: center; background: #eee; }
@@ -133,14 +120,14 @@ if st.session_state.auth_role is None:
                         item_key = f"item_{row.Index}"
                         if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
                         
-                        # Custom Horizontal Row using standard streamlit buttons but tight layout
+                        # Forced Compact Horizontal Layout
                         cq1, cq2, cq3 = st.columns([1, 1, 1])
                         with cq1: 
                             if st.button("−", key=f"btn_m_{row.Index}"):
                                 st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
                                 st.rerun()
                         with cq2:
-                            st.markdown(f"<div style='text-align:center; font-weight:800; font-size:1.5rem; line-height:40px;'>{st.session_state.carrito[item_key]['qty']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div class='qty-display'>{st.session_state.carrito[item_key]['qty']}</div>", unsafe_allow_html=True)
                         with cq3:
                             if st.button("+", key=f"btn_p_{row.Index}"):
                                 st.session_state.carrito[item_key]['qty'] += 1
