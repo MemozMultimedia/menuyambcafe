@@ -62,6 +62,9 @@ st.markdown("""<style>
         background: #25d366; color: white !important; border-radius: 50px;
         display: flex; justify-content: center; align-items: center; font-size: 32px; z-index: 9999;
     }
+
+    .footer-premium { padding: 60px 20px; border-radius: 40px 40px 0 0; margin-top: 80px; text-align: center; border-top: 1px solid #eee; }
+    .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; margin-bottom: 15px; }
 </style>""", unsafe_allow_html=True)
 
 def get_image_base64(path):
@@ -91,7 +94,7 @@ def checkout_modal(carrito, mesa):
             if nombre and cedula:
                 for cat in ["Comida", "Bebida"]:
                     items = [f"{n} x{v[0]}" for n,v in carrito.items() if v[2] == cat]
-                    if items: 
+                    if items:
                         subtotal = sum(v[0]*v[1] for n,v in carrito.items() if v[2] == cat)
                         pd.DataFrame([{"Fecha": datetime.now().strftime("%H:%M"), "Mesa": mesa, "Cliente": nombre, "Pedido": ", ".join(items), "Total": subtotal, "Categoria": cat}]).to_csv(file, mode="a", header=False, index=False)
                 st.success("¡Pedido enviado!"); st.balloons(); st.rerun()
@@ -111,7 +114,7 @@ if st.session_state.auth_role is None:
             if qty > 0: carrito[name] = [qty, price, "Comida"]
     st.markdown("<div class='category-title'>🍹 BEBIDAS</div>", unsafe_allow_html=True)
     bcol1, bcol2 = st.columns(2)
-    items_b = [("Cuba Libre", 150, "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600", "b1"), ("Vodka con jugo", 150, "https://images.unsplash.com/photo-1536935338788-846bb9981813?w=600", "b2"), ("Cerveza Presidente", 150, "https://images.unsplash.com/photo-1618885472179-5e474019f2a9?w=600", "b3"), ("Cerveza One", 100, "https://images.unsplash.com/photo-1584225064785-c62a8b43d148?w=600", "b4"), ("Refresco", 60, "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600", "b5")]
+    items_b = [("Cuba Libre (ron con Coca Cola)", 150, "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600", "b1"), ("Vodka con jugo de naranja", 150, "https://images.unsplash.com/photo-1536935338788-846bb9981813?w=600", "b2"), ("Cerveza Presidente pequeña", 150, "https://images.unsplash.com/photo-1618885472179-5e474019f2a9?w=600", "b3"), ("Cerveza One", 100, "https://images.unsplash.com/photo-1584225064785-c62a8b43d148?w=600", "b4"), ("Refresco", 60, "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600", "b5")]
     for i, (name, price, img, k) in enumerate(items_b):
         with [bcol1, bcol2][i % 2]:
             st.markdown(f"<div class='product-card'><img src='{img}' class='product-img'><div style='padding:15px'><p><b>{name}</b></p><p class='product-price'>RD${price}</p></div></div>", unsafe_allow_html=True)
@@ -120,7 +123,7 @@ if st.session_state.auth_role is None:
     if carrito:
         total = sum(v[0]*v[1] for v in carrito.values())
         if st.button(f"🛒 FINALIZAR - RD${total}", use_container_width=True): checkout_modal(carrito, mesa)
-    st.markdown("""<div style='text-align: center; padding: 40px; border-top: 1px solid #eee; margin-top: 50px;'><h3>☕ Yamb Café</h3><p>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</p></div>""", unsafe_allow_html=True)
+    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div><p style='margin-top:15px; font-size:0.9rem; font-weight:700; color:#e63946;'>Compra con propósito • Apoya el talento</p></div>""", unsafe_allow_html=True)
 elif st.session_state.auth_role == "login":
     st.markdown("<br><div class='admin-box'>", unsafe_allow_html=True)
     st.subheader("🔒 Acceso Personal")
