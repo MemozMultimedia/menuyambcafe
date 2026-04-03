@@ -14,19 +14,23 @@ if not os.path.exists(file):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- Estilos CSS Mejorados ---
+# --- Estilos CSS Modernos ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
-    /* Eliminar espacios sobrantes arriba */
+    /* Eliminar el sidebar y espacios extra */
+    [data-testid="stSidebar"] { display: none; }
     .block-container { padding-top: 1rem; padding-bottom: 0rem; }
     
     html, body, [class*='st-'] { font-family: 'Inter', sans-serif; color: #1e1e1e; }
     .stApp { background-color: #ffffff; }
 
-    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding-bottom: 20px; }
+    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding-bottom: 10px; }
 
-    label, .stMarkdown p { color: #1e1e1e !important; font-weight: 600 !important; }
+    /* Icono Moderno de Cambio de Vista */
+    .admin-toggle { position: fixed; top: 20px; right: 20px; z-index: 1000; cursor: pointer; background: white; padding: 10px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #eee; transition: 0.3s; }
+    .admin-toggle:hover { transform: scale(1.1); }
+
     .category-title { background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); color: white !important; padding: 15px; border-radius: 15px; text-align: center; margin: 20px 0; font-weight: 800; font-size: 1.6rem; text-transform: uppercase; }
     .product-card { background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; margin-bottom: 25px; border: 1px solid #eee; overflow: hidden; }
     .product-img { width: 100%; height: 200px; object-fit: cover; }
@@ -36,8 +40,6 @@ st.markdown("""<style>
 
     .footer-premium { background: #fdfdfd; padding: 60px 20px; border-radius: 40px 40px 0 0; margin-top: 80px; text-align: center; border-top: 1px solid #eaeaea; }
     .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; color: #1e1e1e; letter-spacing: -1px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 15px; }
-    .footer-brand span { color: #e63946; }
-    .footer-text { font-size: 1.05rem; line-height: 1.8; color: #555; max-width: 650px; margin: 0 auto 30px auto; }
     .footer-tagline { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #e63946; letter-spacing: 2px; padding-top: 20px; border-top: 1px solid #eee; display: inline-block; }
 
     .whatsapp-float { position: fixed; width: 65px; height: 65px; bottom: 30px; right: 30px; background: #25d366; color: white !important; border-radius: 50px; text-align: center; font-size: 32px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 9999; display: flex; justify-content: center; align-items: center; text-decoration: none !important; }
@@ -47,9 +49,25 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
+# --- Control de Estado --- 
+if 'admin_mode' not in st.session_state:
+    st.session_state.admin_mode = False
+
 # WhatsApp Button
 whatsapp_link = f"https://wa.me/{whatsapp_number}?text=Hola!%20Vengo%20desde%20el%20menu%20digital."
 st.markdown(f"""<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'><a href='{whatsapp_link}' class='whatsapp-float' target='_blank'><i class='fab fa-whatsapp'></i></a>""", unsafe_allow_html=True)
+
+# Botón Moderno de Cambio
+col_t1, col_t2 = st.columns([10, 1])
+with col_t2:
+    if not st.session_state.admin_mode:
+        if st.button("🔐"):
+            st.session_state.admin_mode = True
+            st.rerun()
+    else:
+        if st.button("📋"):
+            st.session_state.admin_mode = False
+            st.rerun()
 
 @st.dialog("📝 Finalizar Orden")
 def checkout_modal(carrito, mesa):
@@ -68,11 +86,8 @@ def checkout_modal(carrito, mesa):
                 st.balloons()
                 st.rerun()
 
-# --- Navegación en el Sidebar ---
-st.sidebar.title("Navegación")
-seleccion = st.sidebar.radio("Ir a:", ["📋 CARTA DIGITAL", "🔒 PANEL ADMIN"])
-
-if seleccion == "📋 CARTA DIGITAL":
+if not st.session_state.admin_mode:
+    # VISTA CLIENTE
     if os.path.exists(logo_path):
         b64_logo = get_image_base64(logo_path)
         st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' width='250'></div>", unsafe_allow_html=True)
@@ -99,9 +114,7 @@ if seleccion == "📋 CARTA DIGITAL":
         ("Vodka con jugo de naranja", 150, "https://images.unsplash.com/photo-1536935338788-846bb9981813?w=500", "b2"),
         ("Cerveza Presidente pequeña", 150, "https://images.unsplash.com/photo-1618885472179-5e474019f2a9?w=500", "b3"),
         ("Cerveza One", 100, "https://images.unsplash.com/photo-1584225064785-c62a8b43d148?w=500", "b4"),
-        ("Cerveza Heineken mediana", 230, "https://images.unsplash.com/photo-1613215049641-81495014a582?w=500", "b5"),
-        ("Refresco", 60, "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500", "b6"),
-        ("Agua", 25, "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=500", "b7")
+        ("Refresco", 60, "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500", "b6")
     ]
     cols_b = st.columns(2)
     for i, (name, price, img, k) in enumerate(items_bebida):
@@ -116,16 +129,19 @@ if seleccion == "📋 CARTA DIGITAL":
 
     st.markdown("""<div class='footer-premium'>
         <div class='footer-brand'><span>☕</span> Yamb Café</div>
-        <div class='footer-text'>
-            Gracias por tu compra. Cada producto de <b>YAMB</b> tiene un propósito.
-            Con tu compra, apoyas a jóvenes talentos en la música y el arte.
-        </div>
+        <div class='footer-text'>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div>
         <div class='footer-tagline'>Compra con propósito • Apoya el talento</div>
     </div>""", unsafe_allow_html=True)
 
 else:
+    # VISTA ADMIN
     st.title("🔒 Panel de Administración")
-    st.write("Bienvenido al panel de control de pedidos.")
-    if os.path.exists(file): 
+    tab_comida, tab_bebida = st.tabs(["🍔 Comida", "🍹 Bebida"])
+    if os.path.exists(file):
         df_admin = pd.read_csv(file)
-        st.dataframe(df_admin, use_container_width=True)
+        with tab_comida:
+            st.subheader("Pedidos de Comida")
+            st.dataframe(df_admin[df_admin['Categoria'] == 'Comida'], use_container_width=True)
+        with tab_bebida:
+            st.subheader("Pedidos de Bebida")
+            st.dataframe(df_admin[df_admin['Categoria'] == 'Bebida'], use_container_width=True)
