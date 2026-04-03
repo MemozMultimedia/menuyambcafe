@@ -80,7 +80,7 @@ if modo == 'Menú y Pedidos':
                                          columns=['Fecha', 'Cliente', 'Cedula', 'Mesa', 'Pedido', 'Total', 'Status'])
                 nuevo_pedido.to_csv(ORDERS_FILE, mode='a', header=False, index=False)
                 st.balloons()
-                st.success(f'¡Gracias {nombre_cliente}! Pedido enviado con éxito.')
+                st.success(f'✅ ¡Gracias {nombre_cliente}! Su pedido se ha tomado y se le notificará cuando esté listo.')
                 st.session_state['confirmando'] = False
             else:
                 st.warning("Por favor completa tu nombre y cédula.")
