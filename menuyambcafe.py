@@ -50,30 +50,47 @@ with tab_menu:
     carrito = {}
 
     # --- SECCIÓN BEBIDAS ---
-    st.markdown("<h2 class='category-title'>☕ BEBIDAS Y CAFETERÍA</h2>", unsafe_allow_html=True)
-    col_b1, col_b2, col_b3 = st.columns(3)
+    st.markdown("<h2 class='category-title'>☕ BEBIDAS</h2>", unsafe_allow_html=True)
+    cb1, cb2, cb3 = st.columns(3)
     
-    with col_b1:
-        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1541167760496-162955ed8a9f?q=80&w=400' class='menu-img'><div class='card-content'><h3>Café Americano</h3><p class='price-tag'>RD$120</p></div></div>", unsafe_allow_html=True)
-        carrito['Café Americano'] = [st.number_input("Cantidad", 0, 10, key='b1'), 120]
+    with cb1:
+        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1574096079513-d8259312b785?q=80&w=400' class='menu-img'><div class='card-content'><h3>Cuba Libre (RON/COLA)</h3><p class='price-tag'>RD$150</p></div></div>", unsafe_allow_html=True)
+        carrito['Cuba Libre'] = [st.number_input("Cant.", 0, 20, key='dr1'), 150]
 
-    with col_b2:
-        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1572490122747-3968b75cc699?q=80&w=400' class='menu-img'><div class='card-content'><h3>Jugo Natural</h3><p class='price-tag'>RD$150</p></div></div>", unsafe_allow_html=True)
-        carrito['Jugo Natural'] = [st.number_input("Cantidad", 0, 10, key='b2'), 150]
+    with cb2:
+        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=400' class='menu-img'><div class='card-content'><h3>Vodka Naranja</h3><p class='price-tag'>RD$150</p></div></div>", unsafe_allow_html=True)
+        carrito['Vodka Naranja'] = [st.number_input("Cant.", 0, 20, key='dr2'), 150]
 
-    with col_b3:
-        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1556679343-c7306c1976bc?q=80&w=400' class='menu-img'><div class='card-content'><h3>Té Frío</h3><p class='price-tag'>RD$100</p></div></div>", unsafe_allow_html=True)
-        carrito['Té Frío'] = [st.number_input("Cantidad", 0, 10, key='b3'), 100]
+    with cb3:
+        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1535958636474-b021ee887b13?q=80&w=400' class='menu-img'><div class='card-content'><h3>Pz Presidente</h3><p class='price-tag'>RD$150</p></div></div>", unsafe_allow_html=True)
+        carrito['Pz Presidente'] = [st.number_input("Cant.", 0, 20, key='dr3'), 150]
+
+    cb4, cb5, cb6 = st.columns(3)
+    with cb4:
+        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1618885472179-5e4aa4a37ff1?q=80&w=400' class='menu-img'><div class='card-content'><h3>Cerveza One</h3><p class='price-tag'>RD$100</p></div></div>", unsafe_allow_html=True)
+        carrito['Cerveza One'] = [st.number_input("Cant.", 0, 20, key='dr4'), 100]
+    with cb5:
+        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1608270586620-248524c67de9?q=80&w=400' class='menu-img'><div class='card-content'><h3>Heineken</h3><p class='price-tag'>RD$180</p></div></div>", unsafe_allow_html=True)
+        carrito['Heineken'] = [st.number_input("Cant.", 0, 20, key='dr5'), 180]
+    with cb6:
+        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1560023907-5f339617ea30?q=80&w=400' class='menu-img'><div class='card-content'><h3>Agua/Refresco</h3><p class='price-tag'>RD$50</p></div></div>", unsafe_allow_html=True)
+        carrito['Agua/Refresco'] = [st.number_input("Cant.", 0, 20, key='dr6'), 50]
 
     # --- SECCIÓN COMIDA ---
-    st.markdown("<h2 class='category-title'>🍔 COMIDAS Y SNACKS</h2>", unsafe_allow_html=True)
-    col_c1, col_c2 = st.columns(2)
-    with col_c1:
-        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400' class='menu-img'><div class='card-content'><h3>Hamburguesa Yamb</h3><p class='price-tag'>RD$350</p></div></div>", unsafe_allow_html=True)
-        carrito['Hamburguesa Yamb'] = [st.number_input("Cantidad", 0, 10, key='c1'), 350]
-    with col_c2:
-        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=400' class='menu-img'><div class='card-content'><h3>Pizza Personal</h3><p class='price-tag'>RD$300</p></div></div>", unsafe_allow_html=True)
-        carrito['Pizza Personal'] = [st.number_input("Cantidad", 0, 10, key='c2'), 300]
+    st.markdown("<h2 class='category-title'>🍔 COMIDAS</h2>", unsafe_allow_html=True)
+    cf1, cf2, cf3 = st.columns(3)
+
+    with cf1:
+        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400' class='menu-img'><div class='card-content'><h3>Burguer + Papas</h3><p class='price-tag'>RD$350</p></div></div>", unsafe_allow_html=True)
+        carrito['Burguer + Papas'] = [st.number_input("Cant.", 0, 20, key='fd1'), 350]
+
+    with cf2:
+        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1541214113241-21578d2d9b62?q=80&w=400' class='menu-img'><div class='card-content'><h3>Hot Dog Solo</h3><p class='price-tag'>RD$150</p></div></div>", unsafe_allow_html=True)
+        carrito['Hot Dog Solo'] = [st.number_input("Cant.", 0, 20, key='fd2'), 150]
+
+    with cf3:
+        st.markdown("<div class='menu-card'><img src='https://images.unsplash.com/photo-1623238913973-21e45cced554?q=80&w=400' class='menu-img'><div class='card-content'><h3>Hot Dog + Papas</h3><p class='price-tag'>RD$250</p></div></div>", unsafe_allow_html=True)
+        carrito['Hot Dog + Papas'] = [st.number_input("Cant.", 0, 20, key='fd3'), 250]
 
     total_general = sum(v[0] * v[1] for v in carrito.values())
     if total_general > 0:
