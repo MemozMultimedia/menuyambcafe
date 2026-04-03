@@ -20,69 +20,52 @@ if not os.path.exists(file_pedidos):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS UI AVANZADA ---
+# --- CSS UI COMPACTA ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
-    html, body, [class*='st-'] { font-family: 'Inter', sans-serif !important; }
-    .block-container { padding-top: 1rem !important; padding-bottom: 2rem !important; }
+    html, body, [class*='st-'], .stMarkdown, p, label, span, div { font-family: 'Inter', sans-serif !important; color: #1e1e1e !important; }
+    .stApp { background-color: #f8f9fa; }
+    .block-container { padding-top: 0.5rem !important; }
     header, footer { visibility: hidden; }
 
-    .stApp { background-color: #f8f9fa; color: #1e1e1e; }
+    /* LOGO MÁS PEQUEÑO Y RESPONSIVO */
+    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 5px 0; }
+    .logo-img { max-width: 120px; width: 35%; height: auto; }
 
-    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 15px 0; }
-    .logo-img { max-width: 220px; width: 60%; height: auto; }
+    .category-title { background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); color: white !important; padding: 10px; border-radius: 12px; text-align: center; margin: 20px 0; font-weight: 800; font-size: 1.3rem; text-transform: uppercase; }
 
-    .category-title {
-        background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%);
-        color: white !important; padding: 14px; border-radius: 12px; text-align: center; margin: 25px 0;
-        font-weight: 800; font-size: 1.4rem; text-transform: uppercase;
-    }
-
-    .product-card {
-        background: white; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-        overflow: hidden; border: 1px solid #f0f0f0; margin-bottom: 20px;
-    }
-
+    .product-card { background: white; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #f0f0f0; margin-bottom: 15px; }
     .product-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-    .product-info { padding: 12px; text-align: center; }
-    .product-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 4px; }
+    .product-info { padding: 10px; text-align: center; }
+    .product-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 2px; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.2rem; }
 
+    /* BOTONES MÁS CERCA (PILL COMPACTO) */
     .qty-pill-container {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 15px !important;
+        gap: 5px !important; /* GAP reducido para acercar botones */
         background: #f1f3f5;
         border-radius: 40px;
-        padding: 5px 15px;
-        width: 140px;
-        margin: 10px auto !important;
+        padding: 2px 10px;
+        width: 120px;
+        margin: 5px auto !important;
         border: 1px solid #e9ecef;
     }
 
-    .qty-display-text {
-        font-weight: 800; font-size: 1.4rem; color: #495057; min-width: 25px; text-align: center;
-    }
+    .qty-display-text { font-weight: 800; font-size: 1.3rem; color: #495057; min-width: 20px; text-align: center; }
 
-    div.stButton > button {
-        background-color: transparent !important; border: none !important; color: #e63946 !important;
-        padding: 0 !important; font-size: 1.8rem !important; width: 35px !important; height: 35px !important;
-    }
+    div.stButton > button { background-color: transparent !important; border: none !important; color: #e63946 !important; padding: 0 !important; font-size: 1.6rem !important; width: 30px !important; height: 30px !important; }
 
-    .footer-premium {
-        background: #f9f9f9; padding: 60px 20px; border-radius: 40px 40px 0 0;
-        margin-top: 80px; text-align: center; border-top: 1px solid #eee;
-    }
-    .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; margin-bottom: 15px; }
-    .footer-text { color: #444; font-size: 1.1rem; }
-    .footer-tagline { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #e63946; letter-spacing: 2px; padding-top: 20px; border-top: 1px solid #eee; display: inline-block; }
+    .footer-premium { background: #f9f9f9; padding: 40px 20px; border-radius: 40px 40px 0 0; margin-top: 50px; text-align: center; border-top: 1px solid #eee; }
+    .footer-brand { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
+    .footer-text { color: #444; font-size: 1rem; }
+    .footer-tagline { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #e63946; letter-spacing: 2px; padding-top: 10px; border-top: 1px solid #eee; display: inline-block; }
 
-    .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 25px; right: 25px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 9999; box-shadow: 0 8px 15px rgba(37, 211, 102, 0.3); }
-    
-    [data-testid="stHorizontalBlock"] { gap: 1rem; }
+    .whatsapp-float { position: fixed; width: 55px; height: 55px; bottom: 20px; right: 20px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 28px; z-index: 9999; box-shadow: 0 8px 15px rgba(37, 211, 102, 0.3); }
 </style>""", unsafe_allow_html=True)
 
 def get_image_base64(path):
@@ -117,7 +100,6 @@ with c_t2:
 if st.session_state.auth_role is None:
     b64_logo = get_image_base64(logo_path)
     if b64_logo: st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' class='logo-img'></div>", unsafe_allow_html=True)
-    
     mesa = st.text_input("📍 Mesa", "1")
     if os.path.exists(file_menu):
         df_menu = pd.read_csv(file_menu)
@@ -134,10 +116,8 @@ if st.session_state.auth_role is None:
                             <div class='product-price'>RD${row.Precio}</div>
                         </div>
                     </div>""", unsafe_allow_html=True)
-                    
                     item_key = f"item_{row.Index}"
                     if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
-                    
                     st.markdown("<div class='qty-pill-container'>", unsafe_allow_html=True)
                     q1, q2, q3 = st.columns([1, 1, 1])
                     with q1: 
@@ -148,23 +128,15 @@ if st.session_state.auth_role is None:
                         if st.button("+", key=f"p_{row.Index}"): 
                             st.session_state.carrito[item_key]['qty'] += 1; st.rerun()
                     st.markdown("</div>", unsafe_allow_html=True)
-    
     total_final = sum(v['qty']*v['price'] for v in st.session_state.carrito.values())
     if total_final > 0:
         if st.button(f"🛒 FINALIZAR PEDIDO - RD${total_final}", use_container_width=True, type="primary"): checkout_modal(mesa)
-
+    
     st.markdown("""<div class='footer-premium'>
         <div class='footer-brand'>☕ Yamb Café</div>
-        <div class='footer-text'>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div>
+        <div class='footer-text'>Cada producto apoya a jóvenes talentos en la música y el arte.</div>
         <div class='footer-tagline'>Compra con propósito • Apoya el talento</div>
     </div>""", unsafe_allow_html=True)
-
-elif st.session_state.auth_role == "login":
-    rol_sel = st.selectbox("Rol", ["Comida", "Bebida", "Administrador General"])
-    pin = st.text_input("PIN", type="password")
-    if st.button("Entrar", use_container_width=True):
-        if pin == ROLES_CONFIG.get(rol_sel): st.session_state.auth_role = rol_sel; st.rerun()
-        else: st.error("PIN Incorrecto")
 else:
     st.title(f"📊 Panel {st.session_state.auth_role}")
     if os.path.exists(file_pedidos): st.data_editor(pd.read_csv(file_pedidos), use_container_width=True)
