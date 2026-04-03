@@ -43,24 +43,25 @@ st.markdown("""<style>
     .product-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; color: #1e1e1e; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.2rem; }
 
-    /* STYLED PILL QUANTITY SELECTOR */
-    .qty-pill {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* COMPACT PILL SELECTOR FORCED HORIZONTAL */
+    .custom-qty-row {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
         background: #f1f1f1;
         border-radius: 30px;
-        padding: 5px 15px;
+        padding: 5px 10px;
         width: fit-content;
-        margin: 10px auto;
-        gap: 10px;
+        margin: 10px auto !important;
     }
 
     .qty-display {
         font-weight: 800;
         font-size: 1.4rem;
         color: #1e1e1e;
-        min-width: 30px;
+        min-width: 25px;
         text-align: center;
     }
 
@@ -128,8 +129,8 @@ if st.session_state.auth_role is None:
                         item_key = f"item_{row.Index}"
                         if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
                         
-                        # Compact Horizontal Pill Selector
-                        st.markdown("<div class='qty-pill'>", unsafe_allow_html=True)
+                        # USING CUSTOM CSS FORCED FLEX CONTAINER
+                        st.markdown("<div class='custom-qty-row'>", unsafe_allow_html=True)
                         cq1, cq2, cq3 = st.columns([1, 1, 1])
                         with cq1: 
                             if st.button("−", key=f"btn_m_{row.Index}"):
