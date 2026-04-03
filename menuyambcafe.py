@@ -21,19 +21,55 @@ else:
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS Moderno ---
+# --- CSS Mejorado para Estética y UX ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
-    html, body, [class*='st-'] {{ font-family: 'Inter', sans-serif !important; }}
-    .block-container {{ padding-top: 0rem !important; }}
-    header {{ visibility: hidden; height: 0; }}
-    .logo-container {{ display: flex; justify-content: center; align-items: center; width: 100%; padding: 10px 0; }}
-    .logo-img {{ max-width: 140px; width: 40%; height: auto; }}
-    .category-title {{ background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); color: white !important; padding: 12px; border-radius: 15px; text-align: center; margin: 30px 0; font-weight: 800; font-size: 1.5rem; text-transform: uppercase; }}
-    .product-card {{ border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; margin-bottom: 30px; overflow: hidden; background: white; border: 1px solid #f0f0f0; }}
-    .product-img {{ width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }}
-    .product-price {{ color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }}
-    .footer-premium {{ padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 20px; text-align: center; background: #f9f9f9; border-top: 1px solid #eee; }}
+    html, body, [class*='st-'] { font-family: 'Inter', sans-serif !important; color: #1e1e1e; }
+    .stApp { background-color: #ffffff; }
+    .block-container { padding-top: 1rem !important; }
+    header { visibility: hidden; height: 0; }
+
+    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 15px 0; }
+    .logo-img { max-width: 140px; width: 45%; height: auto; }
+
+    .category-title { 
+        background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); 
+        color: white !important; 
+        padding: 12px; 
+        border-radius: 15px; 
+        text-align: center; 
+        margin: 25px 0 15px 0; 
+        font-weight: 800; 
+        font-size: 1.4rem; 
+        text-transform: uppercase; 
+        letter-spacing: 1px;
+    }
+
+    .product-card {
+        border-radius: 20px; 
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
+        text-align: center; 
+        margin-bottom: 25px; 
+        overflow: hidden; 
+        background: white; 
+        border: 1px solid #f0f0f0;
+        transition: transform 0.2s;
+    }
+    .product-card:hover { transform: translateY(-2px); }
+
+    .product-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-bottom: 1px solid #f0f0f0; }
+    
+    .product-info { padding: 15px; }
+    .product-title { font-weight: 800; font-size: 1.15rem; margin-bottom: 5px; color: #1e1e1e; }
+    .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.3rem; margin-bottom: 10px; }
+
+    .qty-container { padding: 0 15px 15px 15px; }
+    
+    .footer-premium { padding: 50px 20px; border-radius: 35px 35px 0 0; margin-top: 40px; text-align: center; background: #f9f9f9; border-top: 1px solid #eee; }
+    .footer-brand { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
+
+    /* Mejora visibilidad de inputs */
+    .stNumberInput label { font-weight: 700 !important; font-size: 0.9rem !important; color: #555 !important; }
 </style>""", unsafe_allow_html=True)
 
 def get_image_base64(path):
@@ -46,6 +82,7 @@ if 'auth_role' not in st.session_state: st.session_state.auth_role = None
 @st.dialog("📝 Finalizar Orden")
 def checkout_modal(carrito, mesa):
     with st.form("form_final"):
+        st.subheader("Datos del Cliente")
         nombre = st.text_input("Nombre Completo")
         cedula = st.text_input("Cédula / ID")
         if st.form_submit_button("ENVIAR PEDIDO AHORA", use_container_width=True):
@@ -55,8 +92,9 @@ def checkout_modal(carrito, mesa):
                     if items:
                         subtotal = sum(v[0]*v[1] for n,v in carrito.items() if v[2] == cat)
                         pd.DataFrame([{"Fecha": datetime.now().strftime("%H:%M"), "Mesa": mesa, "Cliente": nombre, "Pedido": ", ".join(items), "Total": subtotal, "Categoria": cat, "Estado": "Pendiente"}]).to_csv(file_pedidos, mode="a", header=False, index=False)
-                st.success("¡Pedido enviado!"); st.balloons(); st.rerun()
+                st.success("¡Pedido enviado con éxito!"); st.balloons(); st.rerun()
 
+# --- NAVEGACIÓN ---
 c_t1, c_t2 = st.columns([10, 1])
 with c_t2:
     icon = "🔐" if st.session_state.auth_role is None else "📋"
@@ -67,7 +105,10 @@ with c_t2:
 if st.session_state.auth_role is None:
     b64_logo = get_image_base64(logo_path)
     if b64_logo: st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' class='logo-img'></div>", unsafe_allow_html=True)
-    mesa = st.text_input("📍 Mesa", "1")
+    
+    c_mesa1, c_mesa2 = st.columns([1, 1])
+    with c_mesa1: mesa = st.text_input("📍 Número de Mesa", "1")
+    
     carrito = {}
     if os.path.exists(file_menu):
         df_menu = pd.read_csv(file_menu)
@@ -77,20 +118,34 @@ if st.session_state.auth_role is None:
             cols = st.columns(2)
             for i, row in enumerate(items.itertuples()):
                 with cols[i % 2]:
-                    st.markdown(f"<div class='product-card'><img src='{row.Imagen}' class='product-img'><div style='padding:15px;'><div style='font-weight:700;'>{row.Nombre}</div><div class='product-price'>RD${row.Precio}</div></div></div>", unsafe_allow_html=True)
+                    st.markdown(f"""
+                        <div class='product-card'>
+                            <img src='{row.Imagen}' class='product-img'>
+                            <div class='product-info'>
+                                <div class='product-title'>{row.Nombre}</div>
+                                <div class='product-price'>RD${row.Precio}</div>
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
                     if row.Disponible:
-                        qty = st.number_input("Cantidad", 0, 20, key=f"q{row.Index}", label_visibility="collapsed")
+                        qty = st.number_input("Cantidad", 0, 20, key=f"q{row.Index}", label_visibility="visible")
                         if qty > 0: carrito[row.Nombre] = [qty, row.Precio, cat]
+                    else:
+                        st.error("Agotado")
+
     if carrito:
         total = sum(v[0]*v[1] for v in carrito.values())
-        if st.button(f"🛒 FINALIZAR PEDIDO - RD${total}", use_container_width=True): checkout_modal(carrito, mesa)
-    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div>Cada producto apoya el talento local.</div></div>""", unsafe_allow_html=True)
+        st.markdown("--- ")
+        if st.button(f"🛒 VER RESUMEN Y PAGAR - RD${total}", use_container_width=True, type="primary"): 
+            checkout_modal(carrito, mesa)
+    
+    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div style='font-size: 0.95rem; color: #666;'>Cada producto apoya el talento local.</div></div>""", unsafe_allow_html=True)
 
 elif st.session_state.auth_role == "login":
     st.subheader("🔒 Acceso Administrativo")
     rol_sel = st.selectbox("Rol", ["Comida", "Bebida", "Administrador General"])
     pin = st.text_input("PIN", type="password")
-    if st.button("Entrar"):
+    if st.button("Entrar", use_container_width=True):
         if pin == ROLES_CONFIG.get(rol_sel): st.session_state.auth_role = rol_sel; st.rerun()
         else: st.error("PIN Incorrecto")
 
@@ -99,17 +154,17 @@ else:
     df_p = pd.read_csv(file_pedidos)
     
     if st.session_state.auth_role == "Administrador General":
-        st.subheader("Historial Completo de Pedidos")
+        st.subheader("Historial de Pedidos")
         edited_p = st.data_editor(df_p, use_container_width=True, hide_index=True)
-        if st.button("💾 Sincronizar Cambios de Estado"):
+        if st.button("💾 Guardar Cambios"):
             edited_p.to_csv(file_pedidos, index=False)
-            st.success("Estados actualizados")
+            st.success("Sincronizado")
     else:
-        st.subheader(f"Pedidos Pendientes de {st.session_state.auth_role}")
+        st.subheader(f"Pedidos Pendientes")
         mask = (df_p['Categoria'] == st.session_state.auth_role)
         filtered_df = df_p[mask]
         edited_filtered = st.data_editor(filtered_df, use_container_width=True, disabled=["Fecha", "Mesa", "Cliente", "Pedido", "Total", "Categoria"], hide_index=True)
-        if st.button("✅ Marcar como Entregados"):
+        if st.button("✅ Confirmar Entregas", use_container_width=True):
             df_p.update(edited_filtered)
             df_p.to_csv(file_pedidos, index=False)
-            st.success("Pedido actualizado"); st.rerun()
+            st.success("Estados actualizados"); st.rerun()
