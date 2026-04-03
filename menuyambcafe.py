@@ -83,8 +83,8 @@ with tab_menu:
 
         if st.button("CONFIRMAR Y ENVIAR ORDEN", use_container_width=True):
             if nombre_cliente and cedula_cliente:
-                # Formatear el pedido
-                detalle_pedido = ", ".join([f\"{c['item']} (x{c['cant']})\" for c in carrito])
+                # CORRECCIÓN DE SINTAXIS AQUÍ: Evitar escapes dentro de f-strings
+                detalle_pedido = ', '.join([f'{c["item"]} (x{c["cant"]})' for c in carrito])
                 nueva_orden = pd.DataFrame([{
                     'Fecha': datetime.now().strftime('%Y-%m-%d %H:%M'),
                     'Mesa': mesa,
