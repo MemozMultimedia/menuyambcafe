@@ -9,7 +9,11 @@ logo_path = "Vector Smart Object.png"
 file_pedidos = "pedidos.csv"
 file_menu = "menu.csv"
 columns_p = ["Fecha", "Mesa", "Cliente", "Pedido", "Notas", "Total", "Categoria", "Estado"]
-ROLES_CONFIG = {"Comida": "1111", "Bebida": "2222", "Administrador General": "3333"}
+ROLES_CONFIG = {
+    "Comida": "1111",
+    "Bebida": "2222",
+    "Administrador General": "3333"
+}
 
 if not os.path.exists(file_pedidos):
     pd.DataFrame(columns=columns_p).to_csv(file_pedidos, index=False)
@@ -28,7 +32,7 @@ st.markdown("""<style>
 
     .category-title {
         background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%);
-        color: white !important; padding: 14px; border-radius: 12px; text-align: center; margin: 30px 0 20px 0;
+        color: white !important; padding: 14px; border-radius: 12px; text-align: center; margin: 25px 0;
         font-weight: 800; font-size: 1.4rem; text-transform: uppercase;
     }
 
@@ -42,35 +46,38 @@ st.markdown("""<style>
     .product-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 4px; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.2rem; }
 
-    /* ADVANCED PILL UI SELECTOR */
+    /* CENTERED HORIZONTAL PILL SELECTOR */
     .qty-pill-container {
         display: flex !important;
+        flex-direction: row !important;
         align-items: center !important;
-        justify-content: space-between !important;
+        justify-content: center !important;
+        gap: 15px !important;
         background: #f1f3f5;
         border-radius: 40px;
-        padding: 4px 12px;
-        width: 130px;
+        padding: 5px 15px;
+        width: 140px;
         margin: 10px auto !important;
         border: 1px solid #e9ecef;
     }
 
     .qty-display-text {
         font-weight: 800;
-        font-size: 1.3rem;
+        font-size: 1.4rem;
         color: #495057;
+        min-width: 25px;
+        text-align: center;
     }
 
-    /* Stylized UI Buttons */
     div.stButton > button {
         background-color: transparent !important;
         border: none !important;
         color: #e63946 !important;
         padding: 0 !important;
         font-size: 1.8rem !important;
-        transition: 0.2s;
+        width: 35px !important;
+        height: 35px !important;
     }
-    div.stButton > button:hover { transform: scale(1.2); color: #b91d1d !important; }
 
     .footer-premium { padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 50px; text-align: center; background: #fff; border-top: 1px solid #eee; }
     .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 25px; right: 25px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 9999; box-shadow: 0 8px 15px rgba(37, 211, 102, 0.3); }
@@ -82,9 +89,9 @@ if 'auth_role' not in st.session_state: st.session_state.auth_role = None
 @st.dialog("🛒 Resumen de tu Orden")
 def checkout_modal(mesa):
     with st.form("form_final"):
-        st.markdown("### Casi listo")
+        st.markdown("### Datos del Cliente")
         nombre = st.text_input("Nombre Completo")
-        notas = st.text_area("¿Algún detalle o pedido 'Otro'?", placeholder="Ej: Sin cebolla, extra ketchup, etc.")
+        notas = st.text_area("Notas (Ej: Sin cebolla, etc.)")
         if st.form_submit_button("CONFIRMAR Y ENVIAR", use_container_width=True):
             if nombre:
                 for cat in ["Comida", "Bebida"]:
@@ -93,20 +100,16 @@ def checkout_modal(mesa):
                         subtotal = sum(v['qty']*v['price'] for k,v in st.session_state.carrito.items() if v['cat'] == cat)
                         pd.DataFrame([{"Fecha": datetime.now().strftime("%H:%M"), "Mesa": mesa, "Cliente": nombre, "Pedido": ", ".join(items), "Notas": notas, "Total": subtotal, "Categoria": cat, "Estado": "Pendiente"}]).to_csv(file_pedidos, mode="a", header=False, index=False)
                 st.session_state.carrito = {}
-                st.success("¡Tu pedido está en camino!"); st.balloons(); st.rerun()
+                st.success("¡Pedido enviado!"); st.balloons(); st.rerun()
 
-# --- Top Nav ---
 c_t1, c_t2 = st.columns([10, 1])
 with c_t2:
     icon = "🔐" if st.session_state.auth_role is None else "📋"
-    if st.button(icon): 
-        st.session_state.auth_role = "login" if st.session_state.auth_role is None else None
-        st.rerun()
+    if st.button(icon): st.session_state.auth_role = "login" if st.session_state.auth_role is None else None; st.rerun()
 
 if st.session_state.auth_role is None:
     if os.path.exists(logo_path): st.image(logo_path, width=160)
     mesa = st.text_input("📍 Mesa", "1")
-    
     if os.path.exists(file_menu):
         df_menu = pd.read_csv(file_menu)
         for cat in ["Comida", "Bebida"]:
@@ -126,18 +129,16 @@ if st.session_state.auth_role is None:
                     item_key = f"item_{row.Index}"
                     if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
 
-                    # UI PILL QUANTITY SELECTOR
+                    # CENTERED PILL SELECTOR
                     st.markdown("<div class='qty-pill-container'>", unsafe_allow_html=True)
                     q1, q2, q3 = st.columns([1, 1, 1])
                     with q1: 
-                        if st.button("−", key=f"m_{row.Index}"): 
-                            st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
-                            st.rerun()
+                        if st.button("−", key=f"m_{row.Index}"):
+                            st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1); st.rerun()
                     with q2: st.markdown(f"<div class='qty-display-text'>{st.session_state.carrito[item_key]['qty']}</div>", unsafe_allow_html=True)
                     with q3: 
-                        if st.button("+", key=f"p_{row.Index}"): 
-                            st.session_state.carrito[item_key]['qty'] += 1
-                            st.rerun()
+                        if st.button("+", key=f"p_{row.Index}"):
+                            st.session_state.carrito[item_key]['qty'] += 1; st.rerun()
                     st.markdown("</div>", unsafe_allow_html=True)
 
     total_final = sum(v['qty']*v['price'] for v in st.session_state.carrito.values())
