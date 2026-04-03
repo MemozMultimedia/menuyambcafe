@@ -33,7 +33,9 @@ st.markdown("""<style>
 
     .stApp { background-color: #ffffff !important; }
     [data-testid="stSidebar"] { display: none; }
-    .block-container { padding-top: 1.5rem; padding-bottom: 0rem; }
+    
+    /* REDUCCIÓN DE ESPACIO SUPERIOR */
+    .block-container { padding-top: 1rem !important; padding-bottom: 0rem; }
 
     /* SELECTOR DE ADMINISTRADORES */
     div[data-baseweb="select"] * {
@@ -67,8 +69,6 @@ st.markdown("""<style>
         background: #f9f9f9; padding: 60px 20px; border-radius: 40px 40px 0 0;
         margin-top: 80px; text-align: center; border-top: 1px solid #eee;
     }
-    .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; color: #000000 !important; margin-bottom: 15px; }
-    .footer-text { color: #444 !important; font-size: 1.1rem; }
 
     .whatsapp-float {
         position: fixed; width: 65px; height: 65px; bottom: 30px; right: 30px;
@@ -76,7 +76,16 @@ st.markdown("""<style>
         display: flex; justify-content: center; align-items: center; font-size: 32px; z-index: 9999;
     }
 
-    .admin-container { max-width: 500px; margin: 0 auto; padding: 40px; background: #ffffff; border-radius: 20px; border: 1px solid #dddddd; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    /* CLASE ADMIN-BOX PARA EL LOGIN */
+    .admin-box { 
+        max-width: 500px; 
+        margin: 0 auto; 
+        padding: 40px; 
+        background: #ffffff; 
+        border-radius: 20px; 
+        border: 1px solid #dddddd; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    }
 </style>""", unsafe_allow_html=True)
 
 def get_image_base64(path):
@@ -123,7 +132,7 @@ if st.session_state.auth_role is None:
     items_c = [("Hamburguer + papas", 350, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600", "c1"), ("Hot Dog Especial", 250, "https://images.unsplash.com/photo-1541214113241-21578d2d9b62?w=600", "c2")]
     for col, (name, price, img, k) in zip([col1, col2], items_c):
         with col:
-            st.markdown(f"<div class='product-card'><img src='{img}' class='product-img'><div class='product-info'><p class='product-name'>{name}</p><p class='product-price'>${price}</p></div></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='product-card'><img src='{img}' class='product-img'><div class='product-info'><p class='product-name'>{name}</p><p class='product-price'>RD${price}</p></div></div>", unsafe_allow_html=True)
             qty = st.number_input("Cantidad", 0, 10, key=k)
             if qty > 0: carrito[name] = [qty, price, "Comida"]
 
@@ -132,28 +141,27 @@ if st.session_state.auth_role is None:
     items_b = [("Cuba Libre", 150, "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600", "b1"), ("Cerveza Fria", 150, "https://images.unsplash.com/photo-1618885472179-5e474019f2a9?w=600", "b2")]
     for col, (name, price, img, k) in zip([bcol1, bcol2], items_b):
         with col:
-            st.markdown(f"<div class='product-card'><img src='{img}' class='product-img'><div class='product-info'><p class='product-name'>{name}</p><p class='product-price'>${price}</p></div></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='product-card'><img src='{img}' class='product-img'><div class='product-info'><p class='product-name'>{name}</p><p class='product-price'>RD${price}</p></div></div>", unsafe_allow_html=True)
             qty = st.number_input("Cantidad", 0, 10, key=k)
             if qty > 0: carrito[name] = [qty, price, "Bebida"]
 
     if carrito:
         total = sum(v[0]*v[1] for v in carrito.values())
-        if st.button(f"🛒 VER RESUMEN - ${total}", use_container_width=True): checkout_modal(carrito, mesa)
+        if st.button(f"🛒 VER RESUMEN - RD${total}", use_container_width=True): checkout_modal(carrito, mesa)
 
     st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div class='footer-text'>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div></div>""", unsafe_allow_html=True)
 
 elif st.session_state.auth_role == "login":
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    with st.container():
-        st.markdown("<div class='admin-container'>", unsafe_allow_html=True)
-        st.subheader("🔒 Acceso Administrativo")
-        rol_sel = st.selectbox("Seleccione su Rol", ["Comida", "Bebida", "Administrador General"])
-        pin = st.text_input("PIN de seguridad", type="password")
-        if st.button("Ingresar Ahora", use_container_width=True):
-            if pin == ROLES_CONFIG.get(rol_sel):
-                st.session_state.auth_role = rol_sel; st.rerun()
-            else: st.error("Clave incorrecta")
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div class='admin-box'>", unsafe_allow_html=True)
+    st.subheader("🔒 Acceso Administrativo")
+    rol_sel = st.selectbox("Seleccione su Rol", ["Comida", "Bebida", "Administrador General"])
+    pin = st.text_input("PIN de seguridad", type="password")
+    if st.button("Ingresar Ahora", use_container_width=True):
+        if pin == ROLES_CONFIG.get(rol_sel):
+            st.session_state.auth_role = rol_sel; st.rerun()
+        else: st.error("Clave incorrecta")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 else:
     st.title(f"📊 Panel: {st.session_state.auth_role}")
