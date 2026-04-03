@@ -16,7 +16,7 @@ if not os.path.exists(file_pedidos):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS Avanzado para Mobile Horizontal Selectors ---
+# --- CSS Avanzado ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
@@ -51,7 +51,16 @@ st.markdown("""<style>
     .product-title { font-weight: 800; font-size: 1.25rem; margin-bottom: 5px; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }
 
-    /* --- FIX: HORIZONTAL QTY SELECTORS --- */
+    /* Limpieza de estilos en cantidad */
+    .qty-text { 
+        text-align: center; 
+        font-weight: 800; 
+        font-size: 1.3rem; 
+        margin: 0; 
+        text-decoration: none !important; 
+        pointer-events: none; 
+    }
+
     [data-testid="column"] {
         width: calc(33% - 10px) !important;
         flex: 1 1 calc(33% - 10px) !important;
@@ -59,23 +68,13 @@ st.markdown("""<style>
     }
     
     div[data-testid="stHorizontalBlock"] {
-        flex-direction: row !important;
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        justify-content: center !important;
+        flex-direction: row !important; display: flex !important; flex-wrap: nowrap !important; align-items: center !important; justify-content: center !important;
     }
 
-    .stButton > button {
-        width: 100% !important;
-        border-radius: 10px !important;
-        padding: 5px !important;
-        height: 45px !important;
-    }
+    .stButton > button { width: 100% !important; border-radius: 10px !important; height: 45px !important; }
 
     .footer-premium { padding: 40px 20px; border-radius: 40px 40px 0 0; margin-top: 30px; text-align: center; }
     .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; margin-bottom: 15px; }
-    .footer-tagline { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #e63946; letter-spacing: 2px; margin-top: 20px; border-top: 1px solid #eee; display: inline-block; padding-top: 15px; }
 
     .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 20px; right: 20px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 </style>""", unsafe_allow_html=True)
@@ -119,6 +118,9 @@ if st.session_state.auth_role is None:
 
     if os.path.exists(file_menu):
         df_menu = pd.read_csv(file_menu)
+        # Ordenar por Nombre para mejor organización
+        df_menu = df_menu.sort_values(by=['Categoria', 'Nombre'], ascending=[False, True])
+        
         for cat in ["Comida", "Bebida"]:
             st.markdown(f"<div class='category-title'>{'🍔' if cat=='Comida' else '🍹'} {cat.upper()}</div>", unsafe_allow_html=True)
             items = df_menu[df_menu['Categoria'] == cat]
@@ -130,13 +132,12 @@ if st.session_state.auth_role is None:
                         item_key = f"item_{row.Index}"
                         if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
                         
-                        # --- SELECTOR FORZADO HORIZONTAL ---
                         q1, q2, q3 = st.columns([1,1,1])
                         with q1: 
                             if st.button("➖", key=f"min_{row.Index}"): 
                                 st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
                                 st.rerun()
-                        with q2: st.markdown(f"<h4 style='text-align:center; margin-top:10px;'>{st.session_state.carrito[item_key]['qty']}</h4>", unsafe_allow_html=True)
+                        with q2: st.markdown(f"<p class='qty-text'>{st.session_state.carrito[item_key]['qty']}</p>", unsafe_allow_html=True)
                         with q3: 
                             if st.button("➕", key=f"plus_{row.Index}"): 
                                 st.session_state.carrito[item_key]['qty'] += 1
@@ -148,13 +149,7 @@ if st.session_state.auth_role is None:
         if st.button(f"🛒 FINALIZAR PEDIDO - RD${total_final}", use_container_width=True, type="primary"):
             checkout_modal(mesa)
 
-    st.markdown("""<div class='footer-premium'>
-        <div class='footer-brand'>☕ Yamb Café</div>
-        <div style='font-size: 1.1rem; line-height: 1.6; max-width: 700px; margin: 0 auto;'>
-            Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.
-        </div>
-        <div class='footer-tagline'>Compra con propósito • Apoya el talento</div>
-    </div>""", unsafe_allow_html=True)
+    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div><div class='footer-tagline'>Compra con propósito • Apoya el talento</div></div>""", unsafe_allow_html=True)
 
 elif st.session_state.auth_role == "login":
     st.subheader("🔒 Acceso Administrativo")
