@@ -44,7 +44,7 @@ def checkout_modal(carrito, mesa):
                     if items:
                         subtotal = sum(v[0]*v[1] for n,v in carrito.items() if v[2] == cat)
                         pd.DataFrame([{"Fecha": datetime.now().strftime("%H:%M"), "Mesa": mesa, "Cliente": nombre, "Pedido": ", ".join(items), "Total": subtotal, "Categoria": cat}]).to_csv(file, mode="a", header=False, index=False)
-                st.success("¡Pedido recibido! Estará listo pronto.")
+                st.success("¡Gracias por elegirnos! Tu pedido llegará a tu mesa en unos minutos.")
                 st.balloons()
                 st.rerun()
 
