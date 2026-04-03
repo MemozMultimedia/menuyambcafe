@@ -16,7 +16,7 @@ if not os.path.exists(file_pedidos):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS Grid & Mobile Selectors ---
+# --- CSS UI Refinado ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
@@ -43,23 +43,43 @@ st.markdown("""<style>
     .product-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; color: #1e1e1e; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.2rem; }
 
-    /* FIXED ALIGNMENT FOR QUANTITY SELECTOR */
-    [data-testid="stHorizontalBlock"] {
+    /* COMPACT HORIZONTAL SELECTOR */
+    .qty-control-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin: 15px 0;
+    }
+
+    .qty-display {
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: #1e1e1e;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    /* Streamlit button style override for circle look */
+    .stButton > button {
+        border-radius: 50% !important;
+        width: 40px !important;
+        height: 40px !important;
+        padding: 0 !important;
+        display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        display: flex !important;
-        flex-direction: row !important;
-        gap: 10px !important;
+        background-color: #f1f1f1 !important;
+        color: #e63946 !important;
+        border: 1px solid #ddd !important;
+        font-size: 1.2rem !important;
+        transition: 0.2s;
     }
 
-    .qty-text {
-        min-width: 40px; text-align: center; font-weight: 800; font-size: 1.4rem;
-        margin: 0 !important; color: #1e1e1e !important; line-height: 1;
-    }
-
-    .stButton > button {
-        border-radius: 10px !important; width: 100% !important; padding: 0 !important;
-        min-height: 40px !important; font-size: 1.2rem !important;
+    .stButton > button:hover {
+        background-color: #e63946 !important;
+        color: white !important;
+        border-color: #e63946 !important;
     }
 
     .footer-premium { padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 50px; text-align: center; background: #eee; }
@@ -112,16 +132,17 @@ if st.session_state.auth_role is None:
                     if row.Disponible:
                         item_key = f"item_{row.Index}"
                         if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
-
-                        # Selector de una sola fila con alineación corregida
-                        c_q1, c_q2, c_q3 = st.columns([1,1,1])
-                        with c_q1:
-                            if st.button("➖", key=f"m_{row.Index}"):
+                        
+                        # Custom Horizontal Row using standard streamlit buttons but tight layout
+                        cq1, cq2, cq3 = st.columns([1, 1, 1])
+                        with cq1: 
+                            if st.button("−", key=f"btn_m_{row.Index}"):
                                 st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
                                 st.rerun()
-                        with c_q2: st.markdown(f"<p class='qty-text'>{st.session_state.carrito[item_key]['qty']}</p>", unsafe_allow_html=True)
-                        with c_q3:
-                            if st.button("➕", key=f"p_{row.Index}"):
+                        with cq2:
+                            st.markdown(f"<div style='text-align:center; font-weight:800; font-size:1.5rem; line-height:40px;'>{st.session_state.carrito[item_key]['qty']}</div>", unsafe_allow_html=True)
+                        with cq3:
+                            if st.button("+", key=f"btn_p_{row.Index}"):
                                 st.session_state.carrito[item_key]['qty'] += 1
                                 st.rerun()
                     else: st.error("Agotado")
