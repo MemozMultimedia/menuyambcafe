@@ -16,11 +16,11 @@ st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_
 
 # --- Estilos CSS ---
 st.markdown("""<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+    
     html, body, [class*='st-'] { font-family: 'Inter', sans-serif; color: #1e1e1e; }
     .stApp { background-color: #ffffff; }
     
-    /* Contenedor para centrado absoluto del logo */
     .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 20px 0; }
 
     label, .stMarkdown p { color: #1e1e1e !important; font-weight: 600 !important; }
@@ -30,7 +30,29 @@ st.markdown("""<style>
     .product-info { padding: 15px; }
     .product-name { color: #1e1e1e; font-weight: 700; font-size: 1.1rem; min-height: 2.5em; display: flex; align-items: center; justify-content: center; }
     .product-price { color: #e63946; font-weight: 800; font-size: 1.3rem; }
-    .footer-box { background: #f9f9f9; padding: 40px; border-radius: 25px; margin-top: 60px; text-align: center; border: 1px solid #eee; }
+    
+    /* Pie de página Premium */
+    .footer-premium { 
+        background: linear-gradient(to bottom, #ffffff, #fcfcfc); 
+        padding: 60px 20px; 
+        border-radius: 30px; 
+        margin-top: 80px; 
+        text-align: center; 
+        border-top: 1px solid #eee; 
+    }
+    .footer-brand { font-size: 1.8rem; font-weight: 800; color: #e63946; margin-bottom: 15px; }
+    .footer-text { font-size: 1.1rem; line-height: 1.8; color: #444; max-width: 700px; margin: 0 auto 25px auto; }
+    .footer-tagline { 
+        font-family: 'Playfair Display', serif; 
+        font-size: 1.4rem; 
+        font-style: italic; 
+        color: #1e1e1e; 
+        border-top: 2px solid #e63946; 
+        display: inline-block; 
+        padding-top: 15px; 
+        margin-top: 10px;
+    }
+
     .whatsapp-float { position: fixed; width: 65px; height: 65px; bottom: 30px; right: 30px; background: #25d366; color: white !important; border-radius: 50px; text-align: center; font-size: 32px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 9999; display: flex; justify-content: center; align-items: center; text-decoration: none !important; }
 </style>""", unsafe_allow_html=True)
 
@@ -102,10 +124,15 @@ with tab_menu:
         total = sum(v[0]*v[1] for v in carrito.values())
         if st.button(f"🛒 VER RESUMEN - ${total}", width="stretch"): checkout_modal(carrito, mesa)
 
-    st.markdown("""<div class='footer-box'><h3 style='color:#e63946'>☕ Yamb Café</h3>
-    <p>Gracias por tu compra.<br>Cada producto de YAMB tiene un propósito.<br>
-    Con tu compra, apoyas a jóvenes talentos en la música y el arte, ayudándolos a crecer, crear y compartir su pasión con el mundo.</p>
-    <p><b>Compraste con propósito. Apoyaste el talento.</b></p></div>""", unsafe_allow_html=True)
+    st.markdown("""<div class='footer-premium'>
+        <div class='footer-brand'>☕ Yamb Café</div>
+        <div class='footer-text'>
+            Gracias por tu compra. Cada producto de <b>YAMB</b> tiene un propósito. 
+            Con tu compra, apoyas a jóvenes talentos en la música y el arte, 
+            ayudándolos a crecer, crear y compartir su pasión con el mundo.
+        </div>
+        <div class='footer-tagline'>Compraste con propósito. Apoyaste el talento.</div>
+    </div>""", unsafe_allow_html=True)
 
 with tab_admin:
     st.title("Pedidos Recibidos")
