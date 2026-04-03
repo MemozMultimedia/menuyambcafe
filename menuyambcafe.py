@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import os
-import hashlib
 
 st.set_page_config(page_title='Yamb Café - Menu Digital Pro', layout='wide')
 
@@ -17,22 +16,13 @@ st.markdown("""<style>
 </style>""", unsafe_allow_html=True)
 
 # --- DB ---
-USERS_FILE = 'usuarios.csv'
 ORDERS_FILE = 'pedidos.csv'
 
 def init_db():
-    if not os.path.exists(USERS_FILE):
-        pd.DataFrame(columns=['user', 'password', 'nombre']).to_csv(USERS_FILE, index=False)
     if not os.path.exists(ORDERS_FILE):
-        pd.DataFrame(columns=['Fecha', 'Usuario', 'Mesa', 'Pedido', 'Total', 'Status']).to_csv(ORDERS_FILE, index=False)
+        pd.DataFrame(columns=['Fecha', 'Cliente', 'Cedula', 'Mesa', 'Pedido', 'Total', 'Status']).to_csv(ORDERS_FILE, index=False)
 
 init_db()
-
-def make_hashes(password): return hashlib.sha256(str.encode(password)).hexdigest()
-def check_hashes(password, hashed_text): return make_hashes(password) == hashed_text
-
-if 'logged_in' not in st.session_state: st.session_state['logged_in'] = False
-if 'user' not in st.session_state: st.session_state['user'] = ''
 
 menu_data = {
     '☕ Bebidas': [
@@ -48,14 +38,9 @@ menu_data = {
 st.sidebar.title('🦁 Yamb Café')
 modo = st.sidebar.radio('Navegar', ['Menú y Pedidos', 'Panel Admin'])
 
-if st.session_state['logged_in']:
-    st.sidebar.success(f"Usuario: {st.session_state['user']}")
-    if st.sidebar.button('Cerrar Sesión'):
-        st.session_state['logged_in'] = False; st.rerun()
-
 if modo == 'Menú y Pedidos':
     st.title('🍽️ Carta Digital')
-    mesa = st.text_input('Tu Mesa', '1')
+    mesa = st.sidebar.text_input('Tu Mesa', '1')
 
     carrito = []
     for cat, items in menu_data.items():
@@ -79,32 +64,26 @@ if modo == 'Menú y Pedidos':
     if st.sidebar.button('🚀 Confirmar Pedido'):
         if total == 0:
             st.sidebar.error('Carrito vacío')
-        elif not st.session_state['logged_in']:
-            st.session_state['show_login'] = True
         else:
-            p_str = ', '.join([f"{i['name']} x{i['q']}" for i in carrito])
-            pd.DataFrame([[datetime.now().strftime('%H:%M'), st.session_state['user'], mesa, p_str, total, 'Pendiente']],
-                         columns=['Fecha', 'Usuario', 'Mesa', 'Pedido', 'Total', 'Status']).to_csv(ORDERS_FILE, mode='a', header=False, index=False)
-            st.balloons(); st.success('¡Pedido enviado!')
+            st.session_state['confirmando'] = True
 
-    if 'show_login' in st.session_state and st.session_state['show_login'] and not st.session_state['logged_in']:
+    if st.session_state.get('confirmando'):
         st.divider()
-        st.subheader("🔐 Identifícate para completar el pedido")
-        t1, t2 = st.tabs(['Login', 'Registro'])
-        with t1:
-            u = st.text_input('Usuario')
-            p = st.text_input('Clave', type='password')
-            if st.button('Entrar'):
-                df = pd.read_csv(USERS_FILE)
-                if not df[df['user']==u].empty and check_hashes(p, df[df['user']==u].iloc[0]['password']):
-                    st.session_state['logged_in'] = True; st.session_state['user'] = u; st.session_state['show_login'] = False; st.rerun()
-                else: st.error('Datos incorrectos')
-        with t2:
-            nu = st.text_input('Nuevo Usuario')
-            np = st.text_input('Nueva Clave', type='password')
-            if st.button('Registrar y Pedir'):
-                pd.DataFrame([[nu, make_hashes(np), nu]], columns=['user', 'password', 'nombre']).to_csv(USERS_FILE, mode='a', header=False, index=False)
-                st.session_state['logged_in'] = True; st.session_state['user'] = nu; st.session_state['show_login'] = False; st.rerun()
+        st.subheader("📝 Datos para el Pedido")
+        nombre_cliente = st.text_input("Nombre Completo")
+        cedula_cliente = st.text_input("Número de Cédula")
+        
+        if st.button("Finalizar y Enviar"):
+            if nombre_cliente and cedula_cliente:
+                p_str = ', '.join([f"{i['name']} x{i['q']}" for i in carrito])
+                nuevo_pedido = pd.DataFrame([[datetime.now().strftime('%H:%M'), nombre_cliente, cedula_cliente, mesa, p_str, total, 'Pendiente']],
+                                         columns=['Fecha', 'Cliente', 'Cedula', 'Mesa', 'Pedido', 'Total', 'Status'])
+                nuevo_pedido.to_csv(ORDERS_FILE, mode='a', header=False, index=False)
+                st.balloons()
+                st.success(f'¡Gracias {nombre_cliente}! Pedido enviado con éxito.')
+                st.session_state['confirmando'] = False
+            else:
+                st.warning("Por favor completa tu nombre y cédula.")
 
 elif modo == 'Panel Admin':
     st.header('📊 Recibidor de Pedidos')
