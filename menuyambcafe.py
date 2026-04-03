@@ -57,16 +57,28 @@ with tab_menu:
 
     st.divider()
     if carrito:
-        st.subheader("Confirmar Pedido")
+        st.subheader("📝 Resumen de tu Pedido")
+        # Crear tabla de resumen
+        resumen_data = []
+        total_general = 0
+        for item, info in carrito.items():
+            subtotal = info[0] * info[1]
+            resumen_data.append({"Producto": item, "Cantidad": info[0], "Precio Unit.": f"RD${info[1]}", "Subtotal": f"RD${subtotal}"})
+            total_general += subtotal
+        
+        st.table(pd.DataFrame(resumen_data))
+        st.markdown(f"### **Total a Pagar: RD${total_general}**")
+
+        st.subheader("Confirmar Datos")
         nombre = st.text_input("Nombre Completo")
         cedula = st.text_input("Cédula / ID")
         
         if st.button("ENVIAR PEDIDO", use_container_width=True):
             if nombre and cedula:
-                st.success(f"✅ {nombre}, su pedido se ha tomado y se le notificará cuando esté listo.")
+                st.success(f"✅ {nombre}, su pedido por RD${total_general} ha sido recibido.")
                 st.balloons()
             else:
-                st.warning("Por favor ingrese su nombre y cédula para continuar.")
+                st.warning("Por favor ingrese su nombre y cédula para finalizar.")
 
 with tab_admin:
     st.markdown("## 🔐 Panel de Control")
