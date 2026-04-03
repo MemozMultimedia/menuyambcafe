@@ -19,7 +19,15 @@ st.markdown("""<style>
     .category-title { color: #1a1a1a; font-weight: 600; text-align: center; margin: 40px 0 20px 0; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #e63946; display: inline-block; }
     .login-box { max-width: 400px; margin: auto; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); background: white; text-align: center; }
     .stButton>button { background-color: #e63946 !important; color: white !important; border-radius: 50px !important; padding: 10px 25px !important; border: none !important; width: 100%; font-weight: 600 !important; }
+    .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 40px; right: 40px; background-color: #25d366; color: #FFF; border-radius: 50px; text-align: center; font-size: 30px; box-shadow: 2px 2px 3px #999; z-index: 100; transition: all 0.3s ease; }
+    .whatsapp-float:hover { transform: scale(1.1); background-color: #128c7e; color: white; }
+    .whatsapp-icon { margin-top: 15px; }
 </style>""", unsafe_allow_html=True)
+
+st.markdown("""<a href='https://wa.me/1234567890' class='whatsapp-float' target='_blank'>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+    <i class='fa fa-whatsapp whatsapp-icon'></i>
+</a>""", unsafe_allow_html=True)
 
 ORDERS_FILE = 'pedidos.csv'
 if not os.path.exists(ORDERS_FILE):
