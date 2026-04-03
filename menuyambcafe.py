@@ -29,7 +29,7 @@ st.markdown("""<style>
 
     /* LOGO REDUCIDO Y CENTRADO */
     .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 10px 0; }
-    .logo-img { max-width: 180px; width: 60%; height: auto; }
+    .logo-img { max-width: 140px; width: 40%; height: auto; }
 
     @media (prefers-color-scheme: light) {
         .stApp { background-color: #ffffff !important; }
