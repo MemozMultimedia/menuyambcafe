@@ -29,7 +29,7 @@ st.markdown("""<style>
     .block-container { padding-top: 0.5rem !important; }
     header, footer { visibility: hidden; }
 
-    /* LOGO MÁS PEQUEÑO Y RESPONSIVO */
+    /* LOGO MÁS PEQUEÑO */
     .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 5px 0; }
     .logo-img { max-width: 120px; width: 35%; height: auto; }
 
@@ -47,7 +47,7 @@ st.markdown("""<style>
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 5px !important;
+        gap: 5px !important; /* GAP reducido para acercar botones */
         background: #f1f3f5;
         border-radius: 40px;
         padding: 2px 10px;
@@ -61,10 +61,6 @@ st.markdown("""<style>
     div.stButton > button { background-color: transparent !important; border: none !important; color: #e63946 !important; padding: 0 !important; font-size: 1.6rem !important; width: 30px !important; height: 30px !important; }
 
     .footer-premium { background: #f9f9f9; padding: 40px 20px; border-radius: 40px 40px 0 0; margin-top: 50px; text-align: center; border-top: 1px solid #eee; }
-    .footer-brand { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
-    .footer-text { color: #444; font-size: 1rem; }
-    .footer-tagline { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #e63946; letter-spacing: 2px; padding-top: 10px; border-top: 1px solid #eee; display: inline-block; }
-
     .whatsapp-float { position: fixed; width: 55px; height: 55px; bottom: 20px; right: 20px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 28px; z-index: 9999; box-shadow: 0 8px 15px rgba(37, 211, 102, 0.3); }
 </style>""", unsafe_allow_html=True)
 
@@ -131,7 +127,7 @@ if st.session_state.auth_role is None:
     total_final = sum(v['qty']*v['price'] for v in st.session_state.carrito.values())
     if total_final > 0:
         if st.button(f"🛒 FINALIZAR PEDIDO - RD${total_final}", use_container_width=True, type="primary"): checkout_modal(mesa)
-    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div><div class='footer-tagline'>Compra con propósito • Apoya el talento</div></div>""", unsafe_allow_html=True)
+    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div>Cada producto apoya a jóvenes talentos.</div></div>""", unsafe_allow_html=True)
 else:
     st.title(f"📊 Panel {st.session_state.auth_role}")
     if os.path.exists(file_pedidos): st.data_editor(pd.read_csv(file_pedidos), use_container_width=True)
