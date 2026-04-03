@@ -19,9 +19,9 @@ st.markdown("""<style>
     html, body, [class*='st-'] { font-family: 'Inter', sans-serif; color: #1e1e1e; }
     .stApp { background-color: #ffffff; }
     
-    /* Estilos para el logo responsivo */
-    .logo-container { display: flex; justify-content: center; padding: 10px; }
-    .responsive-logo { max-width: 100%; height: auto; width: 250px; }
+    /* Centrado absoluto del logo */
+    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 20px 0; }
+    .responsive-logo { max-width: 100%; height: auto; width: 200px; }
 
     label, .stMarkdown p { color: #1e1e1e !important; font-weight: 600 !important; }
     .category-title { background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); color: white !important; padding: 15px; border-radius: 15px; text-align: center; margin: 30px 0 20px 0; font-weight: 800; font-size: 1.6rem; text-transform: uppercase; }
@@ -57,23 +57,23 @@ def checkout_modal(carrito, mesa):
 tab_menu, tab_admin = st.tabs(["📋 CARTA DIGITAL", "🔒 PANEL ADMIN"])
 
 with tab_menu:
-    # Logo responsivo centrado
+    # Logo centrado manualmente vía HTML/CSS para control total
     if os.path.exists(logo_path):
-        st.markdown("<div class='logo-container'>", unsafe_allow_html=True)
-        st.image(logo_path, width=250)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(f'<div class="logo-container"><img src="data:image/png;base64,{st.image(logo_path, width=200)}" class="responsive-logo"></div>', unsafe_allow_html=True)
+        # Alternativa más estable en Streamlit para el centrado:
+        cols = st.columns([1, 2, 1])
+        with cols[1]:
+            st.image(logo_path, width=200)
     
     mesa = st.text_input("📍 Número de Mesa", "1")
     carrito = {}
 
-    # --- SECCIÓN COMIDA ---
     st.markdown("<div class='category-title'>🍔 COMIDA</div>", unsafe_allow_html=True)
     items_comida = [
         ("Hamburguer + papas fritas", 350, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500", "c1"),
         ("Hot Dog", 200, "https://images.unsplash.com/photo-1541214113241-21578d2d9b62?w=500", "c2"),
         ("Hot Dog + papas fritas", 250, "https://images.unsplash.com/photo-1612392062631-94dd858cba88?w=500", "c3")
     ]
-    
     cols_c = st.columns(2)
     for i, (name, price, img, k) in enumerate(items_comida):
         with cols_c[i % 2]:
@@ -81,7 +81,6 @@ with tab_menu:
             qty = st.number_input("Cantidad", 0, 20, key=k)
             if qty > 0: carrito[name] = [qty, price, "Comida"]
 
-    # --- SECCIÓN BEBIDAS ---
     st.markdown("<div class='category-title'>🍹 BEBIDAS</div>", unsafe_allow_html=True)
     items_bebida = [
         ("Cuba Libre (ron con Coca Cola)", 150, "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=500", "b1"),
@@ -92,7 +91,6 @@ with tab_menu:
         ("Refresco", 60, "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500", "b6"),
         ("Agua", 25, "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=500", "b7")
     ]
-    
     cols_b = st.columns(2)
     for i, (name, price, img, k) in enumerate(items_bebida):
         with cols_b[i % 2]:
