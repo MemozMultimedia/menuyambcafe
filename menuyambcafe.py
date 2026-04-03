@@ -74,8 +74,8 @@ def checkout_modal(carrito, mesa):
 
 if st.session_state.auth_role is None:
     b64_logo = get_image_base64(logo_path)
-    if b64_logo: st.markdown(f"<center><img src='data:image/png;base64,{b64_logo}' width='220'></center>", unsafe_allow_html=True)
-    
+    if b64_logo: st.markdown(f"<center><img src='data:image/png;base64,{b64_logo}' width=220></center>", unsafe_allow_html=True)
+
     mesa = st.text_input("📍 Mesa", "1")
     carrito = {}
 
