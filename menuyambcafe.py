@@ -62,7 +62,7 @@ st.markdown("""<style>
         display: flex; 
         flex-direction: column;
     }
-    .product-img { width: 100%; height: 180px; object-fit: cover; }
+    .product-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-bottom: 1px solid #eee; }
     .product-info { padding: 15px; }
     .product-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.3rem; }
