@@ -22,13 +22,16 @@ st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_
 
 # --- CSS UI AVANZADA ---
 st.markdown("""<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
     html, body, [class*='st-'] { font-family: 'Inter', sans-serif !important; }
     .block-container { padding-top: 1rem !important; padding-bottom: 2rem !important; }
     header, footer { visibility: hidden; }
 
     .stApp { background-color: #f8f9fa; color: #1e1e1e; }
+
+    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 15px 0; }
+    .logo-img { max-width: 220px; width: 60%; height: auto; }
 
     .category-title {
         background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%);
@@ -46,7 +49,6 @@ st.markdown("""<style>
     .product-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 4px; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.2rem; }
 
-    /* CENTERED HORIZONTAL PILL SELECTOR */
     .qty-pill-container {
         display: flex !important;
         flex-direction: row !important;
@@ -62,29 +64,31 @@ st.markdown("""<style>
     }
 
     .qty-display-text {
-        font-weight: 800;
-        font-size: 1.4rem;
-        color: #495057;
-        min-width: 25px;
-        text-align: center;
+        font-weight: 800; font-size: 1.4rem; color: #495057; min-width: 25px; text-align: center;
     }
 
     div.stButton > button {
-        background-color: transparent !important;
-        border: none !important;
-        color: #e63946 !important;
-        padding: 0 !important;
-        font-size: 1.8rem !important;
-        width: 35px !important;
-        height: 35px !important;
+        background-color: transparent !important; border: none !important; color: #e63946 !important;
+        padding: 0 !important; font-size: 1.8rem !important; width: 35px !important; height: 35px !important;
     }
 
-    .footer-premium { padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 50px; text-align: center; background: #fff; border-top: 1px solid #eee; }
+    .footer-premium { 
+        background: #f9f9f9; padding: 60px 20px; border-radius: 40px 40px 0 0; 
+        margin-top: 80px; text-align: center; border-top: 1px solid #eee; 
+    }
+    .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; margin-bottom: 15px; }
+    .footer-text { color: #444; font-size: 1.1rem; }
+    .footer-tagline { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #e63946; letter-spacing: 2px; padding-top: 20px; border-top: 1px solid #eee; display: inline-block; }
+
     .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 25px; right: 25px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 9999; box-shadow: 0 8px 15px rgba(37, 211, 102, 0.3); }
-    
-    /* Grid Responsive: 2 col desktop, 1 col mobile */
+
     [data-testid="stHorizontalBlock"] { gap: 1rem; }
 </style>""", unsafe_allow_html=True)
+
+def get_image_base64(path):
+    if os.path.exists(path):
+        with open(path, "rb") as f: return base64.b64encode(f.read()).decode()
+    return ""
 
 if 'carrito' not in st.session_state: st.session_state.carrito = {}
 if 'auth_role' not in st.session_state: st.session_state.auth_role = None
@@ -111,15 +115,15 @@ with c_t2:
     if st.button(icon): st.session_state.auth_role = "login" if st.session_state.auth_role is None else None; st.rerun()
 
 if st.session_state.auth_role is None:
-    if os.path.exists(logo_path): st.image(logo_path, width=160)
+    b64_logo = get_image_base64(logo_path)
+    if b64_logo: st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' class='logo-img'></div>", unsafe_allow_html=True)
+
     mesa = st.text_input("📍 Mesa", "1")
     if os.path.exists(file_menu):
         df_menu = pd.read_csv(file_menu)
         for cat in ["Comida", "Bebida"]:
             st.markdown(f"<div class='category-title'>{'🍔' if cat=='Comida' else '🍹'} {cat.upper()}</div>", unsafe_allow_html=True)
             items = df_menu[df_menu['Categoria'] == cat]
-            
-            # Logic for Responsive Grid (2 columns on Desktop, handled by Streamlit naturally in wide mode)
             cols = st.columns(2)
             for i, row in enumerate(items.itertuples()):
                 with cols[i % 2]:
@@ -134,7 +138,6 @@ if st.session_state.auth_role is None:
                     item_key = f"item_{row.Index}"
                     if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
 
-                    # CENTERED PILL SELECTOR
                     st.markdown("<div class='qty-pill-container'>", unsafe_allow_html=True)
                     q1, q2, q3 = st.columns([1, 1, 1])
                     with q1: 
@@ -150,7 +153,11 @@ if st.session_state.auth_role is None:
     if total_final > 0:
         if st.button(f"🛒 FINALIZAR PEDIDO - RD${total_final}", use_container_width=True, type="primary"): checkout_modal(mesa)
 
-    st.markdown("""<div class='footer-premium'>☕ Yamb Café<br><small>Apoya a jóvenes talentos</small></div>""", unsafe_allow_html=True)
+    st.markdown("""<div class='footer-premium'>
+        <div class='footer-brand'>☕ Yamb Café</div>
+        <div class='footer-text'>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div>
+        <div class='footer-tagline'>Compra con propósito • Apoya el talento</div>
+    </div>""", unsafe_allow_html=True)
 
 elif st.session_state.auth_role == "login":
     rol_sel = st.selectbox("Rol", ["Comida", "Bebida", "Administrador General"])
