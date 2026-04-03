@@ -16,50 +16,41 @@ if not os.path.exists(file_pedidos):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS Adaptativo (Light/Dark Mode) ---
+# --- CSS Adaptativo ---
 st.markdown("""<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+    
     html, body, [class*='st-'] { font-family: 'Inter', sans-serif !important; }
-
-    /* ELIMINAR ESPACIO SUPERIOR EXCESIVO */
     .block-container { padding-top: 1rem !important; }
 
-    /* LOGO CENTRALIZADO Y RESPONSIVO */
-    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 20px 0; }
-    .logo-img { max-width: 250px; width: 80%; height: auto; }
+    /* LOGO REDUCIDO Y CENTRADO */
+    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 10px 0; }
+    .logo-img { max-width: 180px; width: 60%; height: auto; }
 
-    /* MODO CLARO (Default) */
     @media (prefers-color-scheme: light) {
         .stApp { background-color: #ffffff !important; }
         p, label, span, div, .stMarkdown { color: #1e1e1e !important; }
         .product-card { background: white; border: 1px solid #f0f0f0; }
+        .footer-premium { background: #f9f9f9; border-top: 1px solid #eee; }
     }
 
-    /* MODO OSCURO */
     @media (prefers-color-scheme: dark) {
         .stApp { background-color: #0e1117 !important; }
         p, label, span, div, .stMarkdown { color: #ffffff !important; }
         .product-card { background: #1e1e1e; border: 1px solid #333; }
+        .footer-premium { background: #111111; border-top: 1px solid #333; }
     }
 
-    .category-title {
-        background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%);
-        color: white !important;
-        padding: 15px; border-radius: 15px; text-align: center; margin: 30px 0;
-        font-weight: 800; font-size: 1.6rem; text-transform: uppercase;
-    }
-
-    .product-card {
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        text-align: center; margin-bottom: 30px; overflow: hidden;
-    }
-
+    .category-title { background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); color: white !important; padding: 12px; border-radius: 15px; text-align: center; margin: 25px 0; font-weight: 800; font-size: 1.5rem; text-transform: uppercase; }
+    .product-card { border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; margin-bottom: 30px; overflow: hidden; }
     .product-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-bottom: 1px solid #eee; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }
-    .out-of-stock { color: #888 !important; font-style: italic; font-weight: bold; margin-top: 10px; }
-    .whatsapp-float { position: fixed; width: 65px; height: 65px; bottom: 30px; right: 30px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 32px; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+    
+    /* PIE DE PAGINA */
+    .footer-premium { padding: 40px 20px; border-radius: 30px 30px 0 0; margin-top: 60px; text-align: center; }
+    .footer-brand { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
+
+    .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 30px; right: 30px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 </style>""", unsafe_allow_html=True)
 
 def get_image_base64(path):
@@ -95,7 +86,7 @@ if st.session_state.auth_role is None:
     b64_logo = get_image_base64(logo_path)
     if b64_logo:
         st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' class='logo-img'></div>", unsafe_allow_html=True)
-
+    
     mesa = st.text_input("📍 Mesa", "1")
     carrito = {}
     df_menu = pd.read_csv(file_menu)
@@ -116,6 +107,8 @@ if st.session_state.auth_role is None:
     if carrito:
         total = sum(v[0]*v[1] for v in carrito.values())
         if st.button(f"🛒 FINALIZAR PEDIDO - RD${total}", use_container_width=True): checkout_modal(carrito, mesa)
+
+    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div><p style='margin-top:10px; font-size:0.8rem; font-weight:700; color:#e63946;'>Compra con propósito • Apoya el talento</p></div>""", unsafe_allow_html=True)
 
 elif st.session_state.auth_role == "login":
     st.subheader("🔒 Acceso Administrativo")
