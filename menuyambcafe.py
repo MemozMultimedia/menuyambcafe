@@ -39,10 +39,10 @@ st.markdown("""<style>
         border-radius: 8px !important;
     }
     div[data-baseweb="select"] * { 
-        color: black !important; 
+        color: black !important;
         background-color: white !important;
     }
-    
+
     /* Eliminar espacios superiores */
     .block-container { padding-top: 1rem !important; }
     [data-testid="stSidebar"] { display: none; }
