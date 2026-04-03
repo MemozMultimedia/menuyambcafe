@@ -106,7 +106,7 @@ if st.session_state.auth_role is None:
     if b64_logo: st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' class='logo-img'></div>", unsafe_allow_html=True)
     
     st.markdown("<div class='mesa-ui-bar'>", unsafe_allow_html=True)
-    mesa = st.selectbox("📍 Selecciona tu Mesa aquí", ["Sin Mesa"] + [str(i) for i in range(1, 21)], help="Elige el número de mesa donde te encuentras o selecciona Sin Mesa")
+    mesa = st.selectbox("📍 Selecciona tu Mesa aquí", ["Sin Mesa"] + , help="Elige el número de mesa donde te encuentras o selecciona Sin Mesa")
     st.markdown("</div>", unsafe_allow_html=True)
 
     if os.path.exists(file_menu):
