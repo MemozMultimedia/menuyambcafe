@@ -16,7 +16,7 @@ if not os.path.exists(file_pedidos):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS Avanzado ---
+# --- CSS Mejorado para Alineación de Selector ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
@@ -25,16 +25,7 @@ st.markdown("""<style>
     header { visibility: hidden; height: 0; }
     footer { visibility: hidden; }
 
-    @media (prefers-color-scheme: light) {
-        .stApp { background-color: #ffffff; color: #1e1e1e; }
-        .product-card { background: white; border: 1px solid #f0f0f0; }
-        .footer-premium { background: #f9f9f9; border-top: 1px solid #eee; }
-    }
-    @media (prefers-color-scheme: dark) {
-        .stApp { background-color: #0e1117; color: #ffffff; }
-        .product-card { background: #1e1e1e; border: 1px solid #333; }
-        .footer-premium { background: #111111; border-top: 1px solid #333; }
-    }
+    .stApp { background-color: white; color: #1e1e1e; }
 
     .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 15px 0; }
     .logo-img { max-width: 140px; width: 45%; height: auto; }
@@ -45,37 +36,37 @@ st.markdown("""<style>
         font-weight: 800; font-size: 1.5rem; text-transform: uppercase;
     }
 
-    .product-card { border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-bottom: 25px; overflow: hidden; }
-    .product-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-    .product-info { padding: 15px; text-align: center; }
-    .product-title { font-weight: 800; font-size: 1.25rem; margin-bottom: 5px; }
-    .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }
-
-    /* Limpieza de estilos en cantidad */
-    .qty-text { 
-        text-align: center; 
-        font-weight: 800; 
-        font-size: 1.3rem; 
-        margin: 0; 
-        text-decoration: none !important; 
-        pointer-events: none; 
+    .product-card {
+        background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        margin-bottom: 25px; overflow: hidden; border: 1px solid #eee;
+        display: flex; flex-direction: column;
     }
+    .product-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+    .product-info { padding: 15px; text-align: center; flex-grow: 1; }
+    .product-title { font-weight: 800; font-size: 1.2rem; min-height: 3em; margin-bottom: 5px; }
+    .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.3rem; margin-bottom: 10px; }
 
-    [data-testid="column"] {
-        width: calc(33% - 10px) !important;
-        flex: 1 1 calc(33% - 10px) !important;
-        min-width: calc(33% - 10px) !important;
+    /* --- ÁREA DEL SELECTOR ORGANIZADA --- */
+    .selector-container {
+        background: #fcfcfc; border-top: 1px solid #eee; padding: 10px;
     }
     
-    div[data-testid="stHorizontalBlock"] {
-        flex-direction: row !important; display: flex !important; flex-wrap: nowrap !important; align-items: center !important; justify-content: center !important;
+    [data-testid="column"] {
+        width: calc(33% - 5px) !important; flex: 1 1 calc(33% - 5px) !important; min-width: calc(33% - 5px) !important;
     }
 
-    .stButton > button { width: 100% !important; border-radius: 10px !important; height: 45px !important; }
+    div[data-testid="stHorizontalBlock"] {
+        flex-direction: row !important; display: flex !important; flex-wrap: nowrap !important; align-items: center !important;
+    }
 
-    .footer-premium { padding: 40px 20px; border-radius: 40px 40px 0 0; margin-top: 30px; text-align: center; }
-    .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; margin-bottom: 15px; }
+    .stButton > button { 
+        width: 100% !important; border-radius: 8px !important; height: 40px !important; 
+        border: 1px solid #ddd !important; background: white !important; color: black !important;
+    }
 
+    .qty-text { text-align: center; font-weight: 800; font-size: 1.2rem; margin: 0; pointer-events: none; }
+
+    .footer-premium { padding: 40px 20px; border-radius: 40px 40px 0 0; margin-top: 30px; text-align: center; background: #f9f9f9; border-top: 1px solid #eee; }
     .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 20px; right: 20px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 </style>""", unsafe_allow_html=True)
 
@@ -118,7 +109,6 @@ if st.session_state.auth_role is None:
 
     if os.path.exists(file_menu):
         df_menu = pd.read_csv(file_menu)
-        # Ordenar por Nombre para mejor organización
         df_menu = df_menu.sort_values(by=['Categoria', 'Nombre'], ascending=[False, True])
         
         for cat in ["Comida", "Bebida"]:
@@ -127,21 +117,32 @@ if st.session_state.auth_role is None:
             cols = st.columns(2)
             for i, row in enumerate(items.itertuples()):
                 with cols[i % 2]:
-                    st.markdown(f"<div class='product-card'><img src='{row.Imagen}' class='product-img'><div class='product-info'><div class='product-title'>{row.Nombre}</div><div class='product-price'>RD${row.Precio}</div></div></div>", unsafe_allow_html=True)
+                    # Estructura de tarjeta con área de selector separada
+                    st.markdown(f"""<div class='product-card'>
+                        <img src='{row.Imagen}' class='product-img'>
+                        <div class='product-info'>
+                            <div class='product-title'>{row.Nombre}</div>
+                            <div class='product-price'>RD${row.Precio}</div>
+                        </div>
+                    </div>""", unsafe_allow_html=True)
+                    
                     if row.Disponible:
                         item_key = f"item_{row.Index}"
                         if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
                         
-                        q1, q2, q3 = st.columns([1,1,1])
-                        with q1: 
-                            if st.button("➖", key=f"min_{row.Index}"): 
-                                st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
-                                st.rerun()
-                        with q2: st.markdown(f"<p class='qty-text'>{st.session_state.carrito[item_key]['qty']}</p>", unsafe_allow_html=True)
-                        with q3: 
-                            if st.button("➕", key=f"plus_{row.Index}"): 
-                                st.session_state.carrito[item_key]['qty'] += 1
-                                st.rerun()
+                        with st.container():
+                            st.markdown("<div class='selector-container'>", unsafe_allow_html=True)
+                            q1, q2, q3 = st.columns([1,1,1])
+                            with q1: 
+                                if st.button("➖", key=f"min_{row.Index}"): 
+                                    st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
+                                    st.rerun()
+                            with q2: st.markdown(f"<p class='qty-text'>{st.session_state.carrito[item_key]['qty']}</p>", unsafe_allow_html=True)
+                            with q3: 
+                                if st.button("➕", key=f"plus_{row.Index}"): 
+                                    st.session_state.carrito[item_key]['qty'] += 1
+                                    st.rerun()
+                            st.markdown("</div>", unsafe_allow_html=True)
                     else: st.error("Agotado")
 
     total_final = sum(v['qty']*v['price'] for v in st.session_state.carrito.values())
