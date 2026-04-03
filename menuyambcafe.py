@@ -14,56 +14,31 @@ if not os.path.exists(file):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- Estilos CSS ---
+# --- Estilos CSS Mejorados ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
+    /* Eliminar espacios sobrantes arriba */
+    .block-container { padding-top: 1rem; padding-bottom: 0rem; }
+    
     html, body, [class*='st-'] { font-family: 'Inter', sans-serif; color: #1e1e1e; }
     .stApp { background-color: #ffffff; }
 
-    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 20px 0; }
+    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding-bottom: 20px; }
 
     label, .stMarkdown p { color: #1e1e1e !important; font-weight: 600 !important; }
-    .category-title { background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); color: white !important; padding: 15px; border-radius: 15px; text-align: center; margin: 30px 0 20px 0; font-weight: 800; font-size: 1.6rem; text-transform: uppercase; }
+    .category-title { background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); color: white !important; padding: 15px; border-radius: 15px; text-align: center; margin: 20px 0; font-weight: 800; font-size: 1.6rem; text-transform: uppercase; }
     .product-card { background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; margin-bottom: 25px; border: 1px solid #eee; overflow: hidden; }
     .product-img { width: 100%; height: 200px; object-fit: cover; }
     .product-info { padding: 15px; }
     .product-name { color: #1e1e1e; font-weight: 700; font-size: 1.1rem; min-height: 2.5em; display: flex; align-items: center; justify-content: center; }
     .product-price { color: #e63946; font-weight: 800; font-size: 1.3rem; }
 
-    /* Modern Premium Footer Header */
-    .footer-premium {
-        background: #fdfdfd;
-        padding: 60px 20px;
-        border-radius: 40px 40px 0 0;
-        margin-top: 80px;
-        text-align: center;
-        border-top: 1px solid #eaeaea;
-    }
-    .footer-brand {
-        font-family: 'Playfair Display', serif;
-        font-size: 2.2rem;
-        font-weight: 800;
-        color: #1e1e1e;
-        letter-spacing: -1px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-    }
+    .footer-premium { background: #fdfdfd; padding: 60px 20px; border-radius: 40px 40px 0 0; margin-top: 80px; text-align: center; border-top: 1px solid #eaeaea; }
+    .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; color: #1e1e1e; letter-spacing: -1px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 15px; }
     .footer-brand span { color: #e63946; }
     .footer-text { font-size: 1.05rem; line-height: 1.8; color: #555; max-width: 650px; margin: 0 auto 30px auto; }
-    .footer-tagline {
-        font-size: 0.9rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #e63946;
-        letter-spacing: 2px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-        display: inline-block;
-    }
+    .footer-tagline { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #e63946; letter-spacing: 2px; padding-top: 20px; border-top: 1px solid #eee; display: inline-block; }
 
     .whatsapp-float { position: fixed; width: 65px; height: 65px; bottom: 30px; right: 30px; background: #25d366; color: white !important; border-radius: 50px; text-align: center; font-size: 32px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 9999; display: flex; justify-content: center; align-items: center; text-decoration: none !important; }
 </style>""", unsafe_allow_html=True)
@@ -72,6 +47,7 @@ def get_image_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
+# WhatsApp Button
 whatsapp_link = f"https://wa.me/{whatsapp_number}?text=Hola!%20Vengo%20desde%20el%20menu%20digital."
 st.markdown(f"""<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'><a href='{whatsapp_link}' class='whatsapp-float' target='_blank'><i class='fab fa-whatsapp'></i></a>""", unsafe_allow_html=True)
 
@@ -81,20 +57,22 @@ def checkout_modal(carrito, mesa):
     with st.form("form_final"):
         nombre = st.text_input("Nombre Completo")
         cedula = st.text_input("Cédula / ID")
-        if st.form_submit_button("ENVIAR PEDIDO AHORA", width="stretch"):
+        if st.form_submit_button("ENVIAR PEDIDO AHORA", use_container_width=True):
             if nombre and cedula:
                 for cat in ["Comida", "Bebida"]:
                     items = [f"{n} x{v[0]}" for n,v in carrito.items() if v[2] == cat]
                     if items:
                         subtotal = sum(v[0]*v[1] for n,v in carrito.items() if v[2] == cat)
                         pd.DataFrame([{"Fecha": datetime.now().strftime("%H:%M"), "Mesa": mesa, "Cliente": nombre, "Pedido": ", ".join(items), "Total": subtotal, "Categoria": cat}]).to_csv(file, mode="a", header=False, index=False)
-                st.success("¡Gracias por elegirnos! Tu pedido llegará a tu mesa en unos minutos.")
+                st.success("¡Pedido enviado! Gracias por preferirnos.")
                 st.balloons()
                 st.rerun()
 
-tab_menu, tab_admin = st.tabs(["📋 CARTA DIGITAL", "🔒 PANEL ADMIN"])
+# --- Navegación en el Sidebar ---
+st.sidebar.title("Navegación")
+seleccion = st.sidebar.radio("Ir a:", ["📋 CARTA DIGITAL", "🔒 PANEL ADMIN"])
 
-with tab_menu:
+if seleccion == "📋 CARTA DIGITAL":
     if os.path.exists(logo_path):
         b64_logo = get_image_base64(logo_path)
         st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' width='250'></div>", unsafe_allow_html=True)
@@ -134,18 +112,20 @@ with tab_menu:
 
     if carrito:
         total = sum(v[0]*v[1] for v in carrito.values())
-        if st.button(f"🛒 VER RESUMEN - ${total}", width="stretch"): checkout_modal(carrito, mesa)
+        if st.button(f"🛒 VER RESUMEN - ${total}", use_container_width=True): checkout_modal(carrito, mesa)
 
     st.markdown("""<div class='footer-premium'>
         <div class='footer-brand'><span>☕</span> Yamb Café</div>
         <div class='footer-text'>
             Gracias por tu compra. Cada producto de <b>YAMB</b> tiene un propósito.
-            Con tu compra, apoyas a jóvenes talentos en la música y el arte,
-            ayudándolos a crecer, crear y compartir su pasión con el mundo.
+            Con tu compra, apoyas a jóvenes talentos en la música y el arte.
         </div>
         <div class='footer-tagline'>Compra con propósito • Apoya el talento</div>
     </div>""", unsafe_allow_html=True)
 
-with tab_admin:
-    st.title("Pedidos Recibidos")
-    if os.path.exists(file): st.dataframe(pd.read_csv(file), width="stretch")
+else:
+    st.title("🔒 Panel de Administración")
+    st.write("Bienvenido al panel de control de pedidos.")
+    if os.path.exists(file): 
+        df_admin = pd.read_csv(file)
+        st.dataframe(df_admin, use_container_width=True)
