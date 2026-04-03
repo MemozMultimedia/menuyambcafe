@@ -53,7 +53,8 @@ tab_menu, tab_admin = st.tabs(["📋 CARTA DIGITAL", "🔒 PANEL ADMIN"])
 with tab_menu:
     c1, c2, c3 = st.columns([1,2,1])
     with c2:
-        if os.path.exists(logo_path): st.image(logo_path, width="stretch")
+        # Ajuste de logo para móviles (usando un contenedor de columnas para centrar y dimensionar)
+        if os.path.exists(logo_path): st.image(logo_path, width=200)
     mesa = st.text_input("📍 Número de Mesa", "1")
     carrito = {}
     st.markdown("<div class='category-title'>🍔 Platos & Snacks</div>", unsafe_allow_html=True)
