@@ -154,8 +154,10 @@ if st.session_state.auth_role is None:
 elif st.session_state.auth_role == "login":
     # LOGIN ADMIN
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<div class='admin-box'>", unsafe_allow_html=True)
-    st.subheader("🔒 Acceso Personal")
+    # Aquí aplicamos la clase admin-box envolviendo el contenido
+    with st.container():
+        st.markdown("<div class='admin-box'>", unsafe_allow_html=True)
+        st.subheader("🔒 Acceso Personal")
     rol_sel = st.selectbox("Seleccione su Rol", ["Comida", "Bebida", "Administrador General"])
     pin = st.text_input("Ingrese su PIN", type="password")
     if st.button("Entrar", use_container_width=True):
