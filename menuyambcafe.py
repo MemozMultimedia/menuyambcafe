@@ -7,41 +7,46 @@ logo_path = 'Vector Smart Object.png'
 
 # --- Configuración con Favicon ---
 st.set_page_config(
-    page_title='Yamb Café | Menú Digital', 
-    layout='wide', 
+    page_title='Yamb Café | Menú Digital',
+    layout='wide',
     page_icon=logo_path if os.path.exists(logo_path) else "🍴"
 )
 
-# --- CSS para diseño, logo centrado y admin flotante ---
+# --- CSS para diseño ---
 st.markdown("""<style>
     .stApp { background-color: #ffffff; }
-    .category-header { 
-        background-color: #e63946; 
-        color: white !important; 
-        padding: 15px; 
-        border-radius: 10px; 
-        text-align: center; 
-        margin: 30px 0 20px 0; 
-        font-size: 1.8rem; 
-        font-weight: bold; 
+    .category-header {
+        background-color: #e63946;
+        color: white !important;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        margin: 30px 0 20px 0;
+        font-size: 1.8rem;
+        font-weight: bold;
     }
-    .product-card { 
-        background: white; 
-        border: 1px solid #f0f0f0; 
-        border-radius: 15px; 
-        padding: 15px; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-        text-align: center; 
+    .product-card {
+        background: white;
+        border: 1px solid #f0f0f0;
+        border-radius: 15px;
+        padding: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        text-align: center;
         margin-bottom: 20px;
     }
     .product-name { color: #1e1e1e; font-size: 1.2rem; font-weight: bold; margin: 10px 0; }
     .price-tag { color: #e63946; font-weight: 800; font-size: 1.1rem; }
-    img { border-radius: 10px; }
-    /* Icono admin arriba a la derecha */
-    .admin-link { position: absolute; top: 10px; right: 20px; text-decoration: none; color: #ccc !important; font-size: 20px; }
+    .footer-text {
+        text-align: center;
+        color: #1e1e1e;
+        margin-top: 50px;
+        padding: 20px;
+        border-top: 1px solid #eee;
+        font-style: italic;
+    }
+    .footer-highlight { color: #e63946; font-weight: bold; }
 </style>""", unsafe_allow_html=True)
 
-# --- Función para el Pop-up (Modal) ---
 @st.dialog("📝 Finalizar Pedido")
 def confirmar_pedido_modal(carrito, mesa):
     st.write("Por favor, ingresa tus datos para procesar la orden:")
@@ -61,12 +66,9 @@ tab_menu, tab_admin = st.tabs(['📋 CARTA INTERACTIVA', '🔒 ADMINISTRACIÓN']
 img_placeholder = "https://via.placeholder.com/150"
 
 with tab_menu:
-    # Icono Admin discreto en la esquina (CSS)
-    st.markdown('<a href="#administraci-n" class="admin-link">⚙️</a>', unsafe_allow_html=True)
-
     col_l1, col_l2, col_l3 = st.columns([1,1,1])
     with col_l2:
-        if os.path.exists(logo_path): 
+        if os.path.exists(logo_path):
             st.image(logo_path, use_container_width=True)
         else:
             st.markdown("<h1 style='text-align: center;'>YAMB CAFÉ</h1>", unsafe_allow_html=True)
@@ -74,14 +76,9 @@ with tab_menu:
     mesa = st.text_input("Mesa", "1")
     carrito = {}
 
-    # --- CATEGORÍA: COMIDA ---
     st.markdown("<div class='category-header'>🍔 COMIDA</div>", unsafe_allow_html=True)
     cf1, cf2, cf3 = st.columns(3)
-    comidas = [
-        ("Burguer + Papas", 350, "f1"),
-        ("Hot Dog Especial", 250, "f2"),
-        ("Pizza Personal", 300, "f3")
-    ]
+    comidas = [("Burguer + Papas", 350, "f1"), ("Hot Dog Especial", 250, "f2"), ("Pizza Personal", 300, "f3")]
     for col, (name, price, k) in zip([cf1, cf2, cf3], comidas):
         with col:
             st.markdown("<div class='product-card'>", unsafe_allow_html=True)
@@ -91,14 +88,9 @@ with tab_menu:
             if qty > 0: carrito[name] = [qty, price]
             st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- CATEGORÍA: BEBIDA ---
     st.markdown("<div class='category-header'>☕ BEBIDA</div>", unsafe_allow_html=True)
     cb1, cb2, cb3 = st.columns(3)
-    bebidas = [
-        ("Cappuccino", 180, "b1"),
-        ("Cerveza One", 100, "b2"),
-        ("Jugo Natural", 120, "b3")
-    ]
+    bebidas = [("Cappuccino", 180, "b1"), ("Cerveza One", 100, "b2"), ("Jugo Natural", 120, "b3")]
     for col, (name, price, k) in zip([cb1, cb2, cb3], bebidas):
         with col:
             st.markdown("<div class='product-card'>", unsafe_allow_html=True)
@@ -114,6 +106,14 @@ with tab_menu:
         st.markdown(f"<h3 style='text-align: right;'>Total: RD${total}</h3>", unsafe_allow_html=True)
         if st.button("CONFIRMAR PEDIDO", use_container_width=True, type='primary'):
             confirmar_pedido_modal(carrito, mesa)
+
+    # --- FOOTER CON PROPÓSITO ---
+    st.markdown("""<div class='footer-text'>
+        <p class='footer-highlight'>GRACIAS POR TU COMPRA</p>
+        <p>CADA PRODUCTO DE YAMB TIENE UN PROPÓSITO.</p>
+        <p>CON TU COMPRA, APOYAS A JÓVENES TALENTOS EN LA MÚSICA Y EL ARTE, AYUDÁNDOLOS A CRECER, CREAR Y COMPARTIR SU PASIÓN CON EL MUNDO.</p>
+        <p class='footer-highlight'>COMPRASTE CON PROPÓSITO. APOYASTE EL TALENTO.</p>
+    </div>""", unsafe_allow_html=True)
 
 with tab_admin:
     st.info("Panel administrativo")
