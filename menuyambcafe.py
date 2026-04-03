@@ -16,18 +16,56 @@ if not os.path.exists(file_pedidos):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS ---
+# --- CSS Adaptativo (Light/Dark Mode) ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-    html, body, [class*='st-'], .stMarkdown, p, label, span, div { font-family: 'Inter', sans-serif !important; color: #1e1e1e !important; }
-    .stApp { background-color: #ffffff !important; }
-    .category-title { background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); color: white !important; padding: 15px; border-radius: 15px; text-align: center; margin: 30px 0; font-weight: 800; font-size: 1.6rem; text-transform: uppercase; }
-    .product-card { background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.07); text-align: center; margin-bottom: 30px; border: 1px solid #f0f0f0; overflow: hidden; }
+
+    html, body, [class*='st-'] { font-family: 'Inter', sans-serif !important; }
+
+    /* ELIMINAR ESPACIO SUPERIOR EXCESIVO */
+    .block-container { padding-top: 1rem !important; }
+
+    /* LOGO CENTRALIZADO Y RESPONSIVO */
+    .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 20px 0; }
+    .logo-img { max-width: 250px; width: 80%; height: auto; }
+
+    /* MODO CLARO (Default) */
+    @media (prefers-color-scheme: light) {
+        .stApp { background-color: #ffffff !important; }
+        p, label, span, div, .stMarkdown { color: #1e1e1e !important; }
+        .product-card { background: white; border: 1px solid #f0f0f0; }
+    }
+
+    /* MODO OSCURO */
+    @media (prefers-color-scheme: dark) {
+        .stApp { background-color: #0e1117 !important; }
+        p, label, span, div, .stMarkdown { color: #ffffff !important; }
+        .product-card { background: #1e1e1e; border: 1px solid #333; }
+    }
+
+    .category-title {
+        background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%);
+        color: white !important;
+        padding: 15px; border-radius: 15px; text-align: center; margin: 30px 0;
+        font-weight: 800; font-size: 1.6rem; text-transform: uppercase;
+    }
+
+    .product-card {
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        text-align: center; margin-bottom: 30px; overflow: hidden;
+    }
+
     .product-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-bottom: 1px solid #eee; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }
-    .out-of-stock { color: #888; font-style: italic; font-weight: bold; margin-top: 10px; }
+    .out-of-stock { color: #888 !important; font-style: italic; font-weight: bold; margin-top: 10px; }
     .whatsapp-float { position: fixed; width: 65px; height: 65px; bottom: 30px; right: 30px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 32px; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 </style>""", unsafe_allow_html=True)
+
+def get_image_base64(path):
+    if os.path.exists(path):
+        with open(path, "rb") as f: return base64.b64encode(f.read()).decode()
+    return ""
 
 if 'auth_role' not in st.session_state: st.session_state.auth_role = None
 
@@ -54,7 +92,10 @@ with c_t2:
         st.rerun()
 
 if st.session_state.auth_role is None:
-    if os.path.exists(logo_path): st.image(logo_path, width=220)
+    b64_logo = get_image_base64(logo_path)
+    if b64_logo:
+        st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' class='logo-img'></div>", unsafe_allow_html=True)
+
     mesa = st.text_input("📍 Mesa", "1")
     carrito = {}
     df_menu = pd.read_csv(file_menu)
