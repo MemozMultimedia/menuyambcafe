@@ -18,6 +18,11 @@ st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
     html, body, [class*='st-'] { font-family: 'Inter', sans-serif; color: #1e1e1e; }
     .stApp { background-color: #ffffff; }
+    
+    /* Estilos para el logo responsivo */
+    .logo-container { display: flex; justify-content: center; padding: 10px; }
+    .responsive-logo { max-width: 100%; height: auto; width: 250px; }
+
     label, .stMarkdown p { color: #1e1e1e !important; font-weight: 600 !important; }
     .category-title { background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); color: white !important; padding: 15px; border-radius: 15px; text-align: center; margin: 30px 0 20px 0; font-weight: 800; font-size: 1.6rem; text-transform: uppercase; }
     .product-card { background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; margin-bottom: 25px; border: 1px solid #eee; overflow: hidden; }
@@ -52,9 +57,11 @@ def checkout_modal(carrito, mesa):
 tab_menu, tab_admin = st.tabs(["📋 CARTA DIGITAL", "🔒 PANEL ADMIN"])
 
 with tab_menu:
-    c1, c2, c3 = st.columns([1,2,1])
-    with c2: 
-        if os.path.exists(logo_path): st.image(logo_path, width=200)
+    # Logo responsivo centrado
+    if os.path.exists(logo_path):
+        st.markdown("<div class='logo-container'>", unsafe_allow_html=True)
+        st.image(logo_path, width=250)
+        st.markdown("</div>", unsafe_allow_html=True)
     
     mesa = st.text_input("📍 Número de Mesa", "1")
     carrito = {}
