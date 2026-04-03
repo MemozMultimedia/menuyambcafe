@@ -15,21 +15,22 @@ if not os.path.exists(file):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- Estilos CSS ---
+# --- Estilos CSS Reforzados ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
-    
-    html, body, [class*='st-'], .stMarkdown, p, label, .stTextInput label, .stNumberInput label, .stSelectbox label { 
-        font-family: 'Inter', sans-serif; 
-        color: #1e1e1e !important; 
+
+    /* Forzar visibilidad absoluta de textos */
+    html, body, [class*='st-'], .stMarkdown, p, label, span, div, .stTextInput label, .stNumberInput label, .stSelectbox label {
+        font-family: 'Inter', sans-serif !important;
+        color: #1e1e1e !important;
     }
 
-    .stApp { background-color: #ffffff; }
+    .stApp { background-color: #ffffff !important; }
     [data-testid="stSidebar"] { display: none; }
     .block-container { padding-top: 1.5rem; padding-bottom: 0rem; }
 
     .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding-bottom: 20px; }
-    
+
     .category-title {
         background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%);
         color: white !important;
@@ -57,19 +58,18 @@ st.markdown("""<style>
     .product-name { color: #1e1e1e !important; font-weight: 700; font-size: 1.2rem; min-height: 2.5em; display: flex; align-items: center; justify-content: center; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }
 
-    .footer-premium { 
-        background: #f9f9f9; 
-        padding: 60px 20px; 
-        border-radius: 40px 40px 0 0; 
-        margin-top: 80px; 
-        text-align: center; 
-        border-top: 1px solid #eee; 
+    .footer-premium {
+        background: #f9f9f9;
+        padding: 60px 20px;
+        border-radius: 40px 40px 0 0;
+        margin-top: 80px;
+        text-align: center;
+        border-top: 1px solid #eee;
     }
     .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; color: #1e1e1e !important; margin-bottom: 15px; }
     .footer-text { color: #444 !important; font-size: 1.1rem; }
-    .footer-tagline { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #e63946; letter-spacing: 2px; padding-top: 20px; border-top: 1px solid #eee; display: inline-block; }
 
-    .whatsapp-float { 
+    .whatsapp-float {
         position: fixed; width: 65px; height: 65px; bottom: 30px; right: 30px;
         background: #25d366; color: white !important; border-radius: 50px;
         display: flex; justify-content: center; align-items: center;
@@ -88,12 +88,13 @@ if 'auth_role' not in st.session_state: st.session_state.auth_role = None
 whatsapp_link = f"https://wa.me/{whatsapp_number}?text=Hola!%20Vengo%20desde%20el%20menu%20digital."
 st.markdown(f"""<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'><a href='{whatsapp_link}' class='whatsapp-float' target='_blank'><i class='fab fa-whatsapp'></i></a>""", unsafe_allow_html=True)
 
+# Toggle buttons
 c_t1, c_t2 = st.columns([10, 1])
 with c_t2:
     if st.session_state.auth_role is None:
-        if st.button("🔐"): st.session_state.auth_role = "login"; st.rerun()
+        if st.button("🔐", help="Panel Admin"): st.session_state.auth_role = "login"; st.rerun()
     else:
-        if st.button("📋"): st.session_state.auth_role = None; st.rerun()
+        if st.button("📋", help="Volver al Menú"): st.session_state.auth_role = None; st.rerun()
 
 @st.dialog("📝 Finalizar Orden")
 def checkout_modal(carrito, mesa):
@@ -112,8 +113,8 @@ def checkout_modal(carrito, mesa):
 
 if st.session_state.auth_role is None:
     b64_logo = get_image_base64(logo_path)
-    if b64_logo: st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' width='250'></div>", unsafe_allow_html=True)
-    
+    if b64_logo: st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' width='220'></div>", unsafe_allow_html=True)
+
     mesa = st.text_input("📍 Número de Mesa", "1")
     carrito = {}
 
@@ -134,37 +135,29 @@ if st.session_state.auth_role is None:
             st.markdown(f"<div class='product-card'><img src='{img}' class='product-img'><div class='product-info'><p class='product-name'>{name}</p><p class='product-price'>${price}</p></div></div>", unsafe_allow_html=True)
             qty = st.number_input("Cantidad", 0, 10, key=k)
             if qty > 0: carrito[name] = [qty, price, "Bebida"]
-    
+
     if carrito:
         total = sum(v[0]*v[1] for v in carrito.values())
         if st.button(f"🛒 VER RESUMEN - ${total}", use_container_width=True): checkout_modal(carrito, mesa)
 
-    st.markdown("""<div class='footer-premium'>
-        <div class='footer-brand'><span>☕</span> Yamb Café</div>
-        <div class='footer-text'>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div>
-        <div class='footer-tagline'>Compra con propósito • Apoya el talento</div>
-    </div>""", unsafe_allow_html=True)
+    st.markdown("""<div class='footer-premium'><div class='footer-brand'>☕ Yamb Café</div><div class='footer-text'>Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.</div></div>""", unsafe_allow_html=True)
 
 elif st.session_state.auth_role == "login":
     st.title("🔒 Acceso Administrativo")
-    selected_role = st.selectbox("Acceder como:", ["Comida", "Bebida", "Administrador General"])
+    rol_sel = st.selectbox("Seleccione su Rol", ["Comida", "Bebida", "Administrador General"])
     pin = st.text_input("PIN de seguridad", type="password")
     if st.button("Ingresar"):
-        if pin == "1234":
-            st.session_state.auth_role = selected_role; st.rerun()
+        if pin == "1234": st.session_state.auth_role = rol_sel; st.rerun()
         else: st.error("PIN inválido")
 
 else:
-    role = st.session_state.auth_role
-    st.title(f"📊 Panel: {role}")
-    df = pd.read_csv(file) if os.path.exists(file) else pd.DataFrame(columns=columns)
-    if role == "Comida":
-        st.dataframe(df[df['Categoria'] == 'Comida'], use_container_width=True)
-    elif role == "Bebida":
-        st.dataframe(df[df['Categoria'] == 'Bebida'], use_container_width=True)
-    elif role == "Administrador General":
+    st.title(f"📊 Panel: {st.session_state.auth_role}")
+    df_adm = pd.read_csv(file) if os.path.exists(file) else pd.DataFrame(columns=columns)
+    if st.session_state.auth_role == "Administrador General":
         t1, t2 = st.tabs(["💰 Contabilidad", "📋 Historial"])
         with t1:
-            st.metric("Ventas Totales", f"RD${df['Total'].sum():,.2f}")
-            if not df.empty: st.bar_chart(df.groupby('Categoria')['Total'].sum())
-        with t2: st.dataframe(df, use_container_width=True)
+            st.metric("Ventas Totales", f"RD${df_adm['Total'].sum():,.2f}")
+            if not df_adm.empty: st.bar_chart(df_adm.groupby('Categoria')['Total'].sum())
+        with t2: st.dataframe(df_adm, use_container_width=True)
+    else:
+        st.dataframe(df_adm[df_adm['Categoria'] == st.session_state.auth_role], use_container_width=True)
