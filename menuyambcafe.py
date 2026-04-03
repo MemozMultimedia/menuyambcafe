@@ -51,9 +51,9 @@ st.markdown("""<style>
     .product-title { font-weight: 800; font-size: 1.25rem; margin-bottom: 5px; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }
 
-    /* FIX PARA SELECTOR MOBILE */
-    .qty-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; padding-bottom: 15px; }
-    .stButton > button { width: 100% !important; }
+    /* FIX PARA SELECTOR MOBILE EN UNA SOLA FILA */
+    .stButton > button { width: 100% !important; border-radius: 10px !important; }
+    div[data-testid="column"] { display: flex; align-items: center; justify-content: center; }
 
     .footer-premium { padding: 40px 20px; border-radius: 40px 40px 0 0; margin-top: 30px; text-align: center; }
     .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; margin-bottom: 15px; }
@@ -112,13 +112,13 @@ if st.session_state.auth_role is None:
                         item_key = f"item_{row.Index}"
                         if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
                         
-                        # Diseño de selector compacto para Mobile
+                        # Selector de una sola fila para móvil
                         q1, q2, q3 = st.columns([1,1,1])
                         with q1: 
                             if st.button("➖", key=f"min_{row.Index}"): 
                                 st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
                                 st.rerun()
-                        with q2: st.markdown(f"<h4 style='text-align:center; margin:0;'>{st.session_state.carrito[item_key]['qty']}</h4>", unsafe_allow_html=True)
+                        with q2: st.markdown(f"<h4 style='margin:0; padding-top:5px;'>{st.session_state.carrito[item_key]['qty']}</h4>", unsafe_allow_html=True)
                         with q3: 
                             if st.button("➕", key=f"plus_{row.Index}"): 
                                 st.session_state.carrito[item_key]['qty'] += 1
