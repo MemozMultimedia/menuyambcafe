@@ -16,7 +16,7 @@ if not os.path.exists(file_pedidos):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS para Estética Superior y Mobile Fix ---
+# --- CSS Avanzado para Mobile Horizontal Selectors ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
@@ -51,9 +51,27 @@ st.markdown("""<style>
     .product-title { font-weight: 800; font-size: 1.25rem; margin-bottom: 5px; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }
 
-    /* FIX PARA SELECTOR MOBILE EN UNA SOLA FILA */
-    .stButton > button { width: 100% !important; border-radius: 10px !important; }
-    div[data-testid="column"] { display: flex; align-items: center; justify-content: center; }
+    /* --- FIX: HORIZONTAL QTY SELECTORS --- */
+    [data-testid="column"] {
+        width: calc(33% - 10px) !important;
+        flex: 1 1 calc(33% - 10px) !important;
+        min-width: calc(33% - 10px) !important;
+    }
+    
+    div[data-testid="stHorizontalBlock"] {
+        flex-direction: row !important;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .stButton > button {
+        width: 100% !important;
+        border-radius: 10px !important;
+        padding: 5px !important;
+        height: 45px !important;
+    }
 
     .footer-premium { padding: 40px 20px; border-radius: 40px 40px 0 0; margin-top: 30px; text-align: center; }
     .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; margin-bottom: 15px; }
@@ -63,7 +81,7 @@ st.markdown("""<style>
 </style>""", unsafe_allow_html=True)
 
 def get_image_base64(path):
-    if os.path.exists(path):
+    if os.path.exists(path): 
         with open(path, "rb") as f: return base64.b64encode(f.read()).decode()
     return ""
 
@@ -112,13 +130,13 @@ if st.session_state.auth_role is None:
                         item_key = f"item_{row.Index}"
                         if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
                         
-                        # Selector de una sola fila para móvil
+                        # --- SELECTOR FORZADO HORIZONTAL ---
                         q1, q2, q3 = st.columns([1,1,1])
                         with q1: 
                             if st.button("➖", key=f"min_{row.Index}"): 
                                 st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
                                 st.rerun()
-                        with q2: st.markdown(f"<h4 style='margin:0; padding-top:5px;'>{st.session_state.carrito[item_key]['qty']}</h4>", unsafe_allow_html=True)
+                        with q2: st.markdown(f"<h4 style='text-align:center; margin-top:10px;'>{st.session_state.carrito[item_key]['qty']}</h4>", unsafe_allow_html=True)
                         with q3: 
                             if st.button("➕", key=f"plus_{row.Index}"): 
                                 st.session_state.carrito[item_key]['qty'] += 1
