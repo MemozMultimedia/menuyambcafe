@@ -1,72 +1,115 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime
 import os
 
 logo_path = 'Vector Smart Object.png'
-st.set_page_config(page_title='Yamb Café | Menú', layout='wide')
 
-# --- CSS ---
+st.set_page_config(
+    page_title='Yamb Café | Menú Digital',
+    page_icon=logo_path,
+    layout='wide',
+    initial_sidebar_state='collapsed'
+)
+
+# CSS optimizado para legibilidad (Alto Contraste)
 st.markdown("""<style>
-    .stApp { background-color: #ffffff; }
-    .category-title { background-color: #e63946; color: white !important; padding: 10px; border-radius: 10px; text-align: center; margin-top: 20px; }
-    .menu-card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
-    .price-tag { color: #e63946; font-weight: bold; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    .stApp {
+        background-color: #ffffff !important;
+        color: #1e1e1e !important;
+    }
+
+    /* Forzar color de texto en todos los elementos de Streamlit */
+    h1, h2, h3, h4, p, span, label, .stMarkdown {
+        color: #1e1e1e !important;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .menu-card {
+        background-color: #ffffff;
+        border: 2px solid #f0f0f0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        text-align: center;
+    }
+
+    .category-header {
+        color: #e63946 !important;
+        border-bottom: 3px solid #e63946;
+        padding-bottom: 8px;
+        margin: 40px 0 25px 0;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+    }
+
+    .price-tag {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #e63946 !important;
+    }
+
+    /* Inputs y Botones */
+    .stNumberInput div div input {
+        color: #1e1e1e !important;
+        background-color: #f9f9f9 !important;
+    }
+
+    .stButton>button {
+        background-color: #e63946 !important;
+        color: #ffffff !important;
+        border-radius: 8px !important;
+        font-weight: 700 !important;
+        border: none;
+        padding: 10px 20px;
+    }
 </style>""", unsafe_allow_html=True)
 
+# Lógica de Datos
+ORDERS_FILE = 'pedidos.csv'
+if not os.path.exists(ORDERS_FILE):
+    pd.DataFrame(columns=['Fecha', 'Cliente', 'Cedula', 'Mesa', 'Pedido', 'Total', 'Status']).to_csv(ORDERS_FILE, index=False)
+
+# Pestañas Superiores
 tab_menu, tab_admin = st.tabs(['📋 CARTA INTERACTIVA', '🔒 ADMINISTRACIÓN'])
 
 with tab_menu:
-    st.title("🍽️ Nuestro Menú")
-    mesa = st.text_input("Mesa", "1")
-    carrito = {}
+    c1, c2, c3 = st.columns([1,1,1])
+    with c2:
+        if os.path.exists(logo_path): st.image(logo_path, use_container_width=True)
 
-    # --- COMIDAS PRIMERO ---
-    st.markdown("<h2 class='category-title'>🍔 COMIDAS</h2>", unsafe_allow_html=True)
-    cf1, cf2, cf3 = st.columns(3)
-    with cf1:
-        st.markdown("<div class='menu-card'><h3>Burguer + Papas</h3><p class='price-tag'>RD$350</p></div>", unsafe_allow_html=True)
-        carrito['Burguer'] = [st.number_input("Cant.", 0, 20, key='f1'), 350]
-    with cf2:
-        st.markdown("<div class='menu-card'><h3>Hot Dog Solo</h3><p class='price-tag'>RD$150</p></div>", unsafe_allow_html=True)
-        carrito['HD_S'] = [st.number_input("Cant.", 0, 20, key='f2'), 150]
-    with cf3:
-        st.markdown("<div class='menu-card'><h3>Hot Dog + Papas</h3><p class='price-tag'>RD$250</p></div>", unsafe_allow_html=True)
-        carrito['HD_P'] = [st.number_input("Cant.", 0, 20, key='f3'), 250]
+    st.markdown("<h1 style='text-align: center;'>Menú Yamb Café</h1>", unsafe_allow_html=True)
+    mesa = st.text_input('Número de mesa', value='1')
 
-    # --- BEBIDAS DESPUÉS ---
-    st.markdown("<h2 class='category-title'>☕ BEBIDAS</h2>", unsafe_allow_html=True)
-    cb1, cb2, cb3 = st.columns(3)
-    with cb1:
-        st.markdown("<div class='menu-card'><h3>Cuba Libre</h3><p class='price-tag'>RD$150</p></div>", unsafe_allow_html=True)
-        carrito['CubaLibre'] = [st.number_input("Cant.", 0, 20, key='b1'), 150]
-    with cb2:
-        st.markdown("<div class='menu-card'><h3>Vodka Naranja</h3><p class='price-tag'>RD$150</p></div>", unsafe_allow_html=True)
-        carrito['Vodka'] = [st.number_input("Cant.", 0, 20, key='b2'), 150]
-    with cb3:
-        st.markdown("<div class='menu-card'><h3>Cerveza One</h3><p class='price-tag'>RD$100</p></div>", unsafe_allow_html=True)
-        carrito['Cerveza'] = [st.number_input("Cant.", 0, 20, key='b3'), 100]
+    # Categoría: Comidas
+    st.markdown("<h3 class='category-header'>🍔 Comidas Sugeridas</h3>", unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("<div class='menu-card'><h4>Burguer + Papas</h4><p class='price-tag'>RD$350</p></div>", unsafe_allow_html=True)
+        st.number_input('Cantidad', 0, 10, key='prod_1')
+    with col2:
+        st.markdown("<div class='menu-card'><h4>Hot Dog Especial</h4><p class='price-tag'>RD$250</p></div>", unsafe_allow_html=True)
+        st.number_input('Cantidad', 0, 10, key='prod_2')
 
-    if st.button("CONFIRMAR PEDIDO"):
-        st.success("Pedido enviado")
+    # Categoría: Bebidas
+    st.markdown("<h3 class='category-header'>☕ Bebidas y Cafés</h3>", unsafe_allow_html=True)
+    col3, col4 = st.columns(2)
+    with col3:
+        st.markdown("<div class='menu-card'><h4>Cappuccino</h4><p class='price-tag'>RD$180</p></div>", unsafe_allow_html=True)
+        st.number_input('Cantidad', 0, 10, key='prod_3')
+    with col4:
+        st.markdown("<div class='menu-card'><h4>Cerveza Nacional</h4><p class='price-tag'>RD$150</p></div>", unsafe_allow_html=True)
+        st.number_input('Cantidad', 0, 10, key='prod_4')
+
+    st.markdown("--- settings ---")
+    if st.button("CONFIRMAR Y ENVIAR PEDIDO"):
+        st.balloons()
+        st.success("¡Pedido recibido! Lo estamos preparando.")
 
 with tab_admin:
-    st.header("Accesos Administrativos")
-    col_admin1, col_admin2 = st.columns(2)
-    
-    with col_admin1:
-        st.subheader("🍔 Admin Comida")
-        user_f = st.text_input("Usuario Comida")
-        pass_f = st.text_input("Clave Comida", type="password")
-        if st.button("Entrar Comida"):
-            if user_f == "admin_comida" and pass_f == "yamb123":
-                st.success("Acceso a Comidas concedido")
-            else: st.error("Error")
-            
-    with col_admin2:
-        st.subheader("☕ Admin Bebidas")
-        user_b = st.text_input("Usuario Bebidas")
-        pass_b = st.text_input("Clave Bebidas", type="password")
-        if st.button("Entrar Bebidas"):
-            if user_b == "admin_bebida" and pass_b == "yamb456":
-                st.success("Acceso a Bebidas concedido")
-            else: st.error("Error")
+    st.subheader("Panel de Control")
+    st.info("El acceso está restringido a personal autorizado.")
