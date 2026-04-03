@@ -16,34 +16,33 @@ if not os.path.exists(file_pedidos):
 
 st.set_page_config(page_title="Yamb Café | Menú Digital", layout="wide", page_icon="☕")
 
-# --- CSS para Estética Superior y Temas ---
+# --- CSS para Estética Superior y Mobile Fix ---
 st.markdown("""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
-    
+
     html, body, [class*='st-'] { font-family: 'Inter', sans-serif !important; }
-    .block-container { padding-top: 1rem !important; }
+    .block-container { padding-top: 1rem !important; padding-bottom: 1rem !important; }
     header { visibility: hidden; height: 0; }
+    footer { visibility: hidden; }
 
     @media (prefers-color-scheme: light) {
         .stApp { background-color: #ffffff; color: #1e1e1e; }
         .product-card { background: white; border: 1px solid #f0f0f0; }
         .footer-premium { background: #f9f9f9; border-top: 1px solid #eee; }
-        .product-title { color: #1e1e1e; }
     }
     @media (prefers-color-scheme: dark) {
         .stApp { background-color: #0e1117; color: #ffffff; }
         .product-card { background: #1e1e1e; border: 1px solid #333; }
         .footer-premium { background: #111111; border-top: 1px solid #333; }
-        .product-title { color: #ffffff; }
     }
 
     .logo-container { display: flex; justify-content: center; align-items: center; width: 100%; padding: 15px 0; }
     .logo-img { max-width: 140px; width: 45%; height: auto; }
 
-    .category-title { 
-        background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%); 
-        color: white !important; padding: 12px; border-radius: 15px; text-align: center; margin: 30px 0 20px 0; 
-        font-weight: 800; font-size: 1.5rem; text-transform: uppercase; 
+    .category-title {
+        background: linear-gradient(135deg, #e63946 0%, #b91d1d 100%);
+        color: white !important; padding: 12px; border-radius: 15px; text-align: center; margin: 30px 0 20px 0;
+        font-weight: 800; font-size: 1.5rem; text-transform: uppercase;
     }
 
     .product-card { border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-bottom: 25px; overflow: hidden; }
@@ -52,13 +51,19 @@ st.markdown("""<style>
     .product-title { font-weight: 800; font-size: 1.25rem; margin-bottom: 5px; }
     .product-price { color: #e63946 !important; font-weight: 800; font-size: 1.4rem; }
 
-    .footer-premium { padding: 60px 20px; border-radius: 40px 40px 0 0; margin-top: 60px; text-align: center; }
+    /* FIX PARA SELECTOR MOBILE */
+    .qty-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; padding-bottom: 15px; }
+    .stButton > button { width: 100% !important; }
+
+    .footer-premium { padding: 40px 20px; border-radius: 40px 40px 0 0; margin-top: 30px; text-align: center; }
     .footer-brand { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; margin-bottom: 15px; }
     .footer-tagline { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: #e63946; letter-spacing: 2px; margin-top: 20px; border-top: 1px solid #eee; display: inline-block; padding-top: 15px; }
+
+    .whatsapp-float { position: fixed; width: 60px; height: 60px; bottom: 20px; right: 20px; background: #25d366; color: white !important; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 </style>""", unsafe_allow_html=True)
 
 def get_image_base64(path):
-    if os.path.exists(path): 
+    if os.path.exists(path):
         with open(path, "rb") as f: return base64.b64encode(f.read()).decode()
     return ""
 
@@ -84,16 +89,16 @@ def checkout_modal(mesa):
 c_t1, c_t2 = st.columns([10, 1])
 with c_t2:
     icon = "🔐" if st.session_state.auth_role is None else "📋"
-    if st.button(icon): 
+    if st.button(icon):
         st.session_state.auth_role = "login" if st.session_state.auth_role is None else None
         st.rerun()
 
 if st.session_state.auth_role is None:
     b64_logo = get_image_base64(logo_path)
     if b64_logo: st.markdown(f"<div class='logo-container'><img src='data:image/png;base64,{b64_logo}' class='logo-img'></div>", unsafe_allow_html=True)
-    
+
     mesa = st.text_input("📍 Número de Mesa", "1")
-    
+
     if os.path.exists(file_menu):
         df_menu = pd.read_csv(file_menu)
         for cat in ["Comida", "Bebida"]:
@@ -106,13 +111,15 @@ if st.session_state.auth_role is None:
                     if row.Disponible:
                         item_key = f"item_{row.Index}"
                         if item_key not in st.session_state.carrito: st.session_state.carrito[item_key] = {'qty': 0, 'price': row.Precio, 'cat': cat, 'name': row.Nombre}
-                        qcol1, qcol2, qcol3 = st.columns([1,2,1])
-                        with qcol1: 
+                        
+                        # Diseño de selector compacto para Mobile
+                        q1, q2, q3 = st.columns([1,1,1])
+                        with q1: 
                             if st.button("➖", key=f"min_{row.Index}"): 
                                 st.session_state.carrito[item_key]['qty'] = max(0, st.session_state.carrito[item_key]['qty'] - 1)
                                 st.rerun()
-                        with qcol2: st.markdown(f"<h4 style='text-align:center;'>{st.session_state.carrito[item_key]['qty']}</h4>", unsafe_allow_html=True)
-                        with qcol3: 
+                        with q2: st.markdown(f"<h4 style='text-align:center; margin:0;'>{st.session_state.carrito[item_key]['qty']}</h4>", unsafe_allow_html=True)
+                        with q3: 
                             if st.button("➕", key=f"plus_{row.Index}"): 
                                 st.session_state.carrito[item_key]['qty'] += 1
                                 st.rerun()
@@ -120,13 +127,13 @@ if st.session_state.auth_role is None:
 
     total_final = sum(v['qty']*v['price'] for v in st.session_state.carrito.values())
     if total_final > 0:
-        if st.button(f"🛒 FINALIZAR PEDIDO - RD${total_final}", use_container_width=True, type="primary"): 
+        if st.button(f"🛒 FINALIZAR PEDIDO - RD${total_final}", use_container_width=True, type="primary"):
             checkout_modal(mesa)
-    
+
     st.markdown("""<div class='footer-premium'>
         <div class='footer-brand'>☕ Yamb Café</div>
         <div style='font-size: 1.1rem; line-height: 1.6; max-width: 700px; margin: 0 auto;'>
-            Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte, ayudándolos a crecer, crear y compartir su pasión con el mundo.
+            Cada producto de <b>YAMB</b> apoya a jóvenes talentos en la música y el arte.
         </div>
         <div class='footer-tagline'>Compra con propósito • Apoya el talento</div>
     </div>""", unsafe_allow_html=True)
